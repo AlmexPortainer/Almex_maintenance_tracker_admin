@@ -17,6 +17,7 @@ use Orchid\Support\Facades\Layout;
 class InstrumentEventEditScreen extends Screen
 {
     public $name = 'Evento de Instrumento';
+
     public $description = 'Registrar o editar calibraciones, validaciones o mantenimientos.';
 
     public $instrumentEvent;
@@ -53,7 +54,7 @@ class InstrumentEventEditScreen extends Screen
                 Select::make('instrumentEvent.event_type')
                     ->options([
                         'CALIBRACION' => '📏 Calibración',
-                        'VALIDACION' => '✅ Validación',
+                        'VALIDACION' => '✅ Verificación',
                         'MANTENIMIENTO' => '🛠️ Mantenimiento',
                     ])
                     ->title('Tipo de Evento')
@@ -78,7 +79,7 @@ class InstrumentEventEditScreen extends Screen
                         1 => '✅ Adecuado',
                         0 => '❌ No adecuado',
                     ])
-                    //->empty('Seleccionar...', null)
+                    // ->empty('Seleccionar...', null)
                     ->title('Evaluación'),
 
                 DateTimer::make('instrumentEvent.fecha_proxima')->title('Fecha Próxima'),

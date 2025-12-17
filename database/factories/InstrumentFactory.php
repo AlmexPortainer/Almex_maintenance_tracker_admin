@@ -35,20 +35,20 @@ class InstrumentFactory extends Factory
                 'Laboratorio',
                 'Mantenimiento',
                 'Empaque',
-                'Desarrollo'
+                'Desarrollo',
             ]),
             'location' => $this->faker->randomElement([
-                'Planta A', 'Planta B', 'Área 3', 'Zona de Control', 'Almacén'
+                'Planta A', 'Planta B', 'Área 3', 'Zona de Control', 'Almacén',
             ]),
-            'form' => $this->faker->randomElement(['Intrumento Electronico', 'Intrumento Simple']),
+            'form' => $this->faker->randomElement(['Instrumento Electronico', 'Instrumento Simple']),
 
             // ⚗️ Variables y mediciones
             'Variable Unidad De Medida' => $this->faker->randomElement(['Concentración', 'Flujo', 'Humedad', 'Indice de Refracción', 'KVA', 'MVP', 'N/A', 'Peso', 'Presión', 'Temperatura', 'Transmitancia', 'pH']),
             'equipo' => strtoupper($this->faker->randomElement([
-                'TERMOPAR', 'BALANZA', 'MANÓMETRO', 'HIGRÓMETRO', 'MULTÍMETRO', 'TRANSMISOR', 'SENSOR'
+                'TERMOPAR', 'BALANZA', 'MANÓMETRO', 'HIGRÓMETRO', 'MULTÍMETRO', 'TRANSMISOR', 'SENSOR',
             ])),
             'brand' => $this->faker->randomElement([
-                'Fluke', 'Omega', 'Siemens', 'Honeywell', 'Yokogawa', 'Testo', 'ABB', 'Endress+Hauser'
+                'Fluke', 'Omega', 'Siemens', 'Honeywell', 'Yokogawa', 'Testo', 'ABB', 'Endress+Hauser',
             ]),
             'model' => strtoupper($this->faker->bothify('M-###-??')),
             'code' => strtoupper($this->faker->unique()->bothify('INS-#####')),
