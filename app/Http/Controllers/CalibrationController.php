@@ -8,6 +8,9 @@ use App\Http\Resources\CalibrationResource;
 use App\Models\Calibration;
 use App\Models\CatalogItem;
 
+/**
+ * @deprecated This class is deprecated.
+ */
 class CalibrationController extends Controller
 {
     public function store(StoreCalibrationRequest $request, CatalogItem $catalogItem)

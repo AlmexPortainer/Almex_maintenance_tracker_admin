@@ -7,6 +7,9 @@ use App\Http\Requests\UpdateCatalogItemRequest;
 use App\Http\Resources\CatalogItemResource;
 use App\Models\CatalogItem;
 
+/**
+ * @deprecated This class is deprecated.
+ */
 class CatalogItemController extends Controller
 {
     public function index()

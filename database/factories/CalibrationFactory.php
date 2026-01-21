@@ -5,6 +5,9 @@ namespace Database\Factories;
 use App\Models\CatalogItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @deprecated This class is deprecated.
+ */
 class CalibrationFactory extends Factory
 {
     public function definition(): array

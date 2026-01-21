@@ -4,6 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @deprecated This class is deprecated, use class StoreIntrumentEventRequest instead.
+ */
 class StoreCalibrationRequest extends FormRequest
 {
     public function authorize(): bool

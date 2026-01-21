@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Orchid\Filters\Filterable;
 use Orchid\Screen\AsSource;
 
+/**
+ * @deprecated This class is deprecated.
+ */
 class Calibration extends Model
 {
     use AsSource, Filterable,HasFactory;

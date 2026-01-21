@@ -35,6 +35,11 @@ return new class extends Migration
             $table->enum('types_of_criticality', ['NO_CRITICO', 'CRITICO'])->default('NO_CRITICO');
             $table->enum('level_of_criticality', ['BAJA', 'MEDIA', 'ALTA'])->default('BAJA');
 
+            // Frecuencias de eventos
+            $table->unsignedSmallInteger('calibration_periodicity_days')->default(0);
+            $table->unsignedSmallInteger('validation_periodicity_days')->default(0);
+            $table->unsignedSmallInteger('maintenance_periodicity_days')->default(0);
+
             // Snapshot de calibración
             $table->date('last_calibration_date')->nullable();
             $table->string('last_calibration_user')->nullable();

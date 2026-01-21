@@ -4,6 +4,9 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @deprecated This class is deprecated.
+ */
 class CalibrationResource extends JsonResource
 {
     public function toArray($request)

@@ -31,6 +31,9 @@ class StoreInstrumentRequest extends FormRequest
             'file_manual' => 'nullable|string|max:255',
             'types_of_criticality' => 'nullable|in:NO_CRITICO,CRITICO',
             'level_of_criticality' => 'nullable|in:BAJA,MEDIA,ALTA',
+            'calibration_periodicity_days' => 'nullable|integer|min:0|max:3650',
+            'validation_periodicity_days' => 'nullable|integer|min:0|max:3650',
+            'maintenance_periodicity_days' => 'nullable|integer|min:0|max:3650',
             'is_operational' => 'nullable|boolean',
             'observations' => 'nullable|string',
         ];

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -26,7 +25,7 @@ class UpdateInstrumentRequest extends FormRequest
             'equipo' => 'nullable|string|max:255',
             'brand' => 'nullable|string|max:255',
             'model' => 'nullable|string|max:255',
-            'code' => 'sometimes|string|max:255|unique:intruments,code,' . $instrumentId,
+            'code' => 'sometimes|string|max:255|unique:intruments,code,'.$instrumentId,
             'emt_value' => 'nullable|string|max:255',
             'emt_value_decimal' => 'nullable|numeric',
             'emt_unit' => 'nullable|string|max:255',
@@ -34,6 +33,9 @@ class UpdateInstrumentRequest extends FormRequest
             'file_manual' => 'nullable|string|max:255',
             'types_of_criticality' => 'nullable|in:NO_CRITICO,CRITICO',
             'level_of_criticality' => 'nullable|in:BAJA,MEDIA,ALTA',
+            'calibration_periodicity_days' => 'nullable|integer|min:0|max:3650',
+            'validation_periodicity_days' => 'nullable|integer|min:0|max:3650',
+            'maintenance_periodicity_days' => 'nullable|integer|min:0|max:3650',
             'is_operational' => 'nullable|boolean',
             'observations' => 'nullable|string',
         ];

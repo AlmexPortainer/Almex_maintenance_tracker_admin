@@ -5,6 +5,9 @@ namespace Database\Factories;
 use App\Enums\ItemType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @deprecated This class is deprecated.
+ */
 class CatalogItemFactory extends Factory
 {
     public function definition(): array
