@@ -74,87 +74,81 @@ class PlatformProvider extends OrchidServiceProvider
                         ->route('platform.instruments.list'),
                 ]),
 
-            Menu::make('Reporteria')
+            Menu::make('Reporteria CALIBRACION')
                 ->icon('bs.clipboard-data')
-                ->title('Herramientas de etiquetas')
+                ->title('Reporteria')
                 ->list([
-
-                    // ===== CALIBRACION =====
-                    Menu::make('CALIBRACION')
-                        ->icon('bs.ticket')
-                        ->list([
-                            Menu::make('Produccion')
-                                ->icon('bs.book')
-                                ->route('platform.reporteria', [
-                                    'tipo' => 'calibracion',
-                                    'area' => 'produccion',
-                                ]),
-
-                            Menu::make('Calidad')
-                                ->icon('bs.book')
-                                ->route('platform.reporteria', [
-                                    'tipo' => 'calibracion',
-                                    'area' => 'calidad',
-                                ]),
-
-                            Menu::make('Servicios')
-                                ->icon('bs.book')
-                                ->route('platform.reporteria', [
-                                    'tipo' => 'calibracion',
-                                    'area' => 'servicios',
-                                ]),
+                    Menu::make('Produccion')
+                        ->icon('bs.book')
+                        ->route('platform.reporter', [
+                            'tipo' => 'calibracion',
+                            'area' => 'produccion',
                         ]),
 
-                    // ===== VERIFICACION =====
-                    Menu::make('VERIFICACION')
-                        ->icon('bs.check2-square')
-                        ->list([
-                            Menu::make('Produccion')
-                                ->icon('bs.book')
-                                ->route('platform.reporteria', [
-                                    'tipo' => 'verificacion',
-                                    'area' => 'produccion',
-                                ]),
-
-                            Menu::make('Calidad')
-                                ->icon('bs.book')
-                                ->route('platform.reporteria', [
-                                    'tipo' => 'verificacion',
-                                    'area' => 'calidad',
-                                ]),
-
-                            Menu::make('Servicios')
-                                ->icon('bs.book')
-                                ->route('platform.reporteria', [
-                                    'tipo' => 'verificacion',
-                                    'area' => 'servicios',
-                                ]),
+                    Menu::make('Calidad')
+                        ->icon('bs.book')
+                        ->route('platform.reporter', [
+                            'tipo' => 'calibracion',
+                            'area' => 'calidad',
                         ]),
 
-                    // ===== MANTENIMIENTO =====
-                    Menu::make('MANTENIMIENTO')
-                        ->icon('bs.tools')
-                        ->list([
-                            Menu::make('Produccion')
-                                ->icon('bs.book')
-                                ->route('platform.reporteria', [
-                                    'tipo' => 'mantenimiento',
-                                    'area' => 'produccion',
-                                ]),
+                    Menu::make('Servicios')
+                        ->icon('bs.book')
+                        ->route('platform.reporter', [
+                            'tipo' => 'calibracion',
+                            'area' => 'servicios',
+                        ]),
+                ]),
 
-                            Menu::make('Calidad')
-                                ->icon('bs.book')
-                                ->route('platform.reporteria', [
-                                    'tipo' => 'mantenimiento',
-                                    'area' => 'calidad',
-                                ]),
+            // ===== VERIFICACION =====
+            Menu::make('VERIFICACION')
+                ->icon('bs.check2-square')
+                ->list([
+                    Menu::make('Produccion')
+                        ->icon('bs.book')
+                        ->route('platform.reporter', [
+                            'tipo' => 'verificacion',
+                            'area' => 'produccion',
+                        ]),
 
-                            Menu::make('Servicios')
-                                ->icon('bs.book')
-                                ->route('platform.reporteria', [
-                                    'tipo' => 'mantenimiento',
-                                    'area' => 'servicios',
-                                ]),
+                    Menu::make('Calidad')
+                        ->icon('bs.book')
+                        ->route('platform.reporter', [
+                            'tipo' => 'verificacion',
+                            'area' => 'calidad',
+                        ]),
+
+                    Menu::make('Servicios')
+                        ->icon('bs.book')
+                        ->route('platform.reporter', [
+                            'tipo' => 'verificacion',
+                            'area' => 'servicios',
+                        ]),
+                ]),
+
+            // ===== MANTENIMIENTO =====
+            Menu::make('MANTENIMIENTO')
+                ->icon('bs.tools')
+                ->list([
+                    Menu::make('Produccion')
+                        ->icon('bs.book')
+                        ->route('platform.reporter', [
+                            'tipo' => 'mantenimiento',
+                            'area' => 'produccion',
+                        ]),
+
+                    Menu::make('Calidad')
+                        ->icon('bs.book')
+                        ->route('platform.reporter', [
+                            'tipo' => 'mantenimiento',
+                            'area' => 'calidad',
+                        ]),
+
+                    Menu::make('Servicios')
+                        ->icon('bs.book')
+                        ->route('platform.reporter', [
+                            'tipo' => 'mantenimiento',
+                            'area' => 'servicios',
                         ]),
                 ]),
 

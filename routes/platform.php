@@ -14,29 +14,28 @@ use App\Orchid\Screens\Examples\ExampleGridScreen;
 use App\Orchid\Screens\Examples\ExampleLayoutsScreen;
 use App\Orchid\Screens\Examples\ExampleScreen;
 use App\Orchid\Screens\Examples\ExampleTextEditorsScreen;
-
+use App\Orchid\Screens\InstrumentEvents\InstrumentEventEditScreen;
+use App\Orchid\Screens\InstrumentEvents\InstrumentEventListScreen;
+use App\Orchid\Screens\InstrumentEvents\InstrumentEventShowScreen;
+use App\Orchid\Screens\Instruments\InstrumentEditScreen;
+use App\Orchid\Screens\Instruments\InstrumentListScreen;
+use App\Orchid\Screens\Instruments\InstrumentShowScreen;
+// === Instrumentos ===
 use App\Orchid\Screens\Items\CatalogItemEditScreen;
 use App\Orchid\Screens\Items\CatalogItemListScreen;
+// === Eventos de Instrumento (Calibración / Validación / Mantenimiento) ===
 use App\Orchid\Screens\Items\CatalogItemShowScreen;
 use App\Orchid\Screens\PlatformScreen;
+use App\Orchid\Screens\Reporter\ReporterScreen;
 use App\Orchid\Screens\Role\RoleEditScreen;
+// === Instrumentos ===
 use App\Orchid\Screens\Role\RoleListScreen;
 use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
+// === Eventos de Instrumento (Calibración / Validación / Mantenimiento) ===
 use App\Orchid\Screens\User\UserProfileScreen;
 use Illuminate\Support\Facades\Route;
 use Tabuna\Breadcrumbs\Trail;
-
-// === Instrumentos ===
-use App\Orchid\Screens\Instruments\InstrumentListScreen;
-use App\Orchid\Screens\Instruments\InstrumentEditScreen;
-use App\Orchid\Screens\Instruments\InstrumentShowScreen;
-
-// === Eventos de Instrumento (Calibración / Validación / Mantenimiento) ===
-use App\Orchid\Screens\InstrumentEvents\InstrumentEventListScreen;
-use App\Orchid\Screens\InstrumentEvents\InstrumentEventEditScreen;
-use App\Orchid\Screens\InstrumentEvents\InstrumentEventCreateScreen;
-use App\Orchid\Screens\InstrumentEvents\InstrumentEventShowScreen;
 
 /*
 |--------------------------------------------------------------------------
@@ -164,6 +163,23 @@ Route::screen('instruments/{instrument}', InstrumentEditScreen::class)
 Route::screen('instruments/{instrument}/view', InstrumentShowScreen::class)
     ->name('platform.instruments.view');
 
+// Instrumentos
+Route::screen('instruments', InstrumentListScreen::class) // Cambia al nombre real de tu Screen
+    ->name('platform.instruments.list')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.main')
+        ->push(__('Instrumentos'), route('platform.instruments.list')));
+
+Route::screen('instruments/{instrument}/events/create', InstrumentEventEditScreen::class)
+    ->name('platform.instruments.events.create');
+
+// Reportería Dinámica (tipo y area)
+Route::screen('reporter/{tipo}/{area}', ReporterScreen::class)
+    ->name('platform.reporter')
+    ->breadcrumbs(fn (Trail $trail, $tipo, $area) => $trail
+        ->parent('platform.main')
+        ->push(ucfirst((string) $tipo).' - '.ucfirst((string) $area)));
+
 // -----------------------------------------------------
 // ⚙️ Eventos de Instrumento (Global y Anidados)
 // -----------------------------------------------------
@@ -190,4 +206,17 @@ Route::screen('instruments/{instrument}/events', InstrumentEventListScreen::clas
 Route::screen('instruments/{instrument}/events/create', InstrumentEventEditScreen::class)
     ->name('platform.instruments.events.create');
 
+/*
+Route::screen('instrument-events-global', InstrumentEventGlobalScreen::class)
+    ->name('platform.instrument_events.global')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.main')
+        ->push(__('Actualización Global'), route('platform.instrument_events.global')));
+*/
 
+// Reportería Dinámica (tipo y area)
+Route::screen('reporter/{tipo}/{area}', \App\Orchid\Screens\Reporter\ReporterScreen::class)
+    ->name('platform.reporter')
+    ->breadcrumbs(fn (Trail $trail, $tipo, $area) => $trail
+        ->parent('platform.index')
+        ->push(ucfirst((string) $tipo).' - '.ucfirst((string) $area)));
