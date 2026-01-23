@@ -55,12 +55,16 @@ class PlatformProvider extends OrchidServiceProvider
                 ->list([
                     Menu::make('Instrumentos CRÍTICOS')
                         ->icon('bs.exclamation-diamond')
-                        ->route('platform.instruments.list')
+                        ->route('platform.instruments.list', [
+                            'types_of_criticality' => 'CRITICO',
+                        ])
                         ->badge(fn () => Instrument::where('types_of_criticality', 'CRITICO')->count()),
 
                     Menu::make('Instrumentos NO CRÍTICOS')
                         ->icon('bs.slash-circle')
-                        ->route('platform.instrument_events.global')
+                        ->route('platform.instrument_events.global', [
+                            'types_of_criticality' => 'NO_CRITICO',
+                        ])
                         ->badge(fn () => Instrument::where('types_of_criticality', 'NO_CRITICO')->count()),
                 ]),
 
