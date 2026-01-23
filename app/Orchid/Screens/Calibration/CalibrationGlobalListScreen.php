@@ -9,6 +9,9 @@ use Orchid\Screen\Screen;
 use Orchid\Screen\TD;
 use Orchid\Support\Facades\Layout;
 
+/**
+ * @deprecated This class is deprecated.
+ */
 class CalibrationGlobalListScreen extends Screen
 {
     public $name = 'Calibraciones (Global)';

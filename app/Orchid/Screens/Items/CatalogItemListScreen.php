@@ -8,6 +8,9 @@ use Orchid\Screen\Layouts\Table;
 use Orchid\Screen\Screen;
 use Orchid\Screen\TD;
 
+/**
+ * @deprecated This class is deprecated.
+ */
 class CatalogItemListScreen extends Screen
 {
     public $name = 'Catálogo de Instrumentos';

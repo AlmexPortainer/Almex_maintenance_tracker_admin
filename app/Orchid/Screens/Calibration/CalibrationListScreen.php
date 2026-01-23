@@ -9,9 +9,13 @@ use Orchid\Screen\Layouts\Table;
 use Orchid\Screen\Screen;
 use Orchid\Screen\TD;
 
+/**
+ * @deprecated This class is deprecated.
+ */
 class CalibrationListScreen extends Screen
 {
     public $name = 'Calibraciones';
+
     public $description = 'Histórico de calibraciones del equipo';
 
     private CatalogItem $catalogItem;

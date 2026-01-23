@@ -10,6 +10,9 @@ use Orchid\Screen\Sight;
 use Orchid\Screen\TD;
 use Orchid\Support\Facades\Layout;
 
+/**
+ * @deprecated This class is deprecated.
+ */
 class CatalogItemShowScreen extends Screen
 {
     public $name = 'Detalle de Ítem';

@@ -14,6 +14,9 @@ use Orchid\Screen\Screen;
 use Orchid\Support\Facades\Layout;
 use Orchid\Support\Facades\Toast;
 
+/**
+ * @deprecated This class is deprecated.
+ */
 class CatalogItemEditScreen extends Screen
 {
     public $name = 'Editar Ítem';

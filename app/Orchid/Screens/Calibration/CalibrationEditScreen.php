@@ -14,9 +14,12 @@ use Orchid\Screen\Screen;
 use Orchid\Support\Facades\Layout;
 use Orchid\Support\Facades\Toast;
 
+/**
+ * @deprecated This class is deprecated.
+ */
 class CalibrationEditScreen extends Screen
 {
-    //http://127.0.0.1:8000/admin/catalog-items/1/calibrations/1
+    // http://127.0.0.1:8000/admin/catalog-items/1/calibrations/1
     public $name = 'Nueva Calibración';
 
     public $exists = false;
