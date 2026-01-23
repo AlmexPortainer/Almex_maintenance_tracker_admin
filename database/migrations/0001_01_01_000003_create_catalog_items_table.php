@@ -19,9 +19,9 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->enum('form', ['Instrumento Electronico', 'Instrumento Mecánico', 'Instrumento Simple'])->default('Instrumento Simple');
 
-            $table->enum('Variable Unidad De Medida', ['Conductividad', 'Concentración', 'Flujo', 'Humedad', 'Indice de Refracción', 'KVA', 'MVP', 'N/A', 'Peso', 'Presión', 'Temperatura', 'Transmitancia', 'pH'])->default('N/A')->nullable();
-            // ⁉️ traslate
-            $table->string('equipo')->nullable(); // ⁉️ traslate
+            $table->enum('variable_unit_of_measure', ['Conductividad', 'Concentración', 'Flujo', 'Humedad', 'Indice de Refracción', 'KVA', 'MVP', 'N/A', 'Peso', 'Presión', 'Temperatura', 'Transmitancia', 'pH'])->default('N/A')->nullable();
+
+            $table->string('equipo')->nullable();
             $table->string('brand')->nullable();
             $table->string('model')->nullable();
             $table->string('code')->unique();

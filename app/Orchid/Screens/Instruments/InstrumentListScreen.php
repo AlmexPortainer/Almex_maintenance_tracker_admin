@@ -11,6 +11,7 @@ use Orchid\Support\Facades\Layout;
 class InstrumentListScreen extends Screen
 {
     public $name = 'Catálogo de Instrumentos';
+
     public $description = 'Listado general de instrumentos con detalles y estado operativo.';
 
     public function query(): array
@@ -33,17 +34,21 @@ class InstrumentListScreen extends Screen
     {
         return [
             Layout::table('instruments', [
-                TD::make('code', 'Código')->sort()->filter()
-                ->render(fn($i) => Link::make($i->code)->route('platform.instruments.view', $i->id)),
-                TD::make('name', 'Nombre'),
-                TD::make('type', 'Tipo'),
                 TD::make('department', 'Departamento'),
                 TD::make('location', 'Ubicación'),
+                TD::make('type', 'Forma'),
+                TD::make('variable_unit_of_measure', 'Variable'),
+                TD::make('name', 'Equipo'),
                 TD::make('brand', 'Marca'),
                 TD::make('model', 'Modelo'),
-                TD::make('next_calibration_date', 'Próxima Calibración')->render(fn($i) => $i->next_calibration_date?->format('Y-m-d')),
-                TD::make('is_operational', 'Operativo')->render(fn($i) => $i->is_operational ? '✅' : '❌'),
-                TD::make('updated_at', 'Actualizado')->render(fn($i) => $i->updated_at->diffForHumans()),
+                TD::make('code', 'Código')->sort()->filter()
+                    ->render(fn ($i) => Link::make($i->code)->route('platform.instruments.view', $i->id)),
+                TD::make('emt_value', 'E.M.T.'),
+
+                TD::make('calibration_periodicity_days', 'Periodo de calibracion'),
+
+                TD::make('file_manual', 'Instructivo'),
+                TD::make('updated_at', 'Actualizado')->render(fn ($i) => $i->updated_at->diffForHumans()),
             ]),
         ];
     }

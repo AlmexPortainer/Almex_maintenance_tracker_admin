@@ -15,7 +15,9 @@ use Orchid\Support\Facades\Layout;
 class InstrumentEditScreen extends Screen
 {
     public $name = 'Instrumento';
+
     public $description = 'Crear o editar información del instrumento.';
+
     public $instrument;
 
     public function query(Instrument $instrument): array
@@ -27,14 +29,14 @@ class InstrumentEditScreen extends Screen
 
     public function commandBar(): array
     {
-//        return [
-//            Button::make('💾 Guardar')->icon('check')->method('save'),
-//        ];
+        //        return [
+        //            Button::make('💾 Guardar')->icon('check')->method('save'),
+        //        ];
         return [
             Button::make('Guardar')->icon('check')->method('save')->canSee(true),
-//            Button::make('Eliminar')->icon('trash')->method('remove')
-//                ->confirm('¿Eliminar definitivamente este ítem?')
-//                ->canSee($this->exists),
+            //            Button::make('Eliminar')->icon('trash')->method('remove')
+            //                ->confirm('¿Eliminar definitivamente este ítem?')
+            //                ->canSee($this->exists),
         ];
     }
 
@@ -63,6 +65,11 @@ class InstrumentEditScreen extends Screen
                     'NO_CRITICO' => 'No crítico',
                     'CRITICO' => 'Crítico',
                 ])->title('Tipo de criticidad'),
+
+                Input::make('instrument.calibration_periodicity_days')->title('Frecuencia calibración days'),
+                Input::make('instrument.validation_periodicity_days')->title('Frecuencia verificación days'),
+                Input::make('instrument.maintenance_periodicity_days')->title('Frecuencia mantenimiento days'),
+
                 TextArea::make('instrument.observations')->title('Observaciones'),
             ]),
         ];
@@ -73,6 +80,7 @@ class InstrumentEditScreen extends Screen
         $instrument->fill($request->get('instrument'))->save();
 
         Alert::info('Instrumento guardado correctamente.');
+
         return redirect()->route('platform.instruments.list');
     }
 }

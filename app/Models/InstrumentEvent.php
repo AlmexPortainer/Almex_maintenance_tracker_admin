@@ -33,13 +33,14 @@ class InstrumentEvent extends Model
     {
         return $this->belongsTo(Instrument::class);
     }
+
     protected static function booted()
     {
         static::saved(function (InstrumentEvent $event) {
             $instrument = $event->instrument;
             if (! $instrument) {
                 return;
-            }//INS-67235
+            }
 
             // 🔄 Actualiza snapshot dependiendo del tipo de evento
             switch ($event->event_type) {
@@ -109,6 +110,4 @@ class InstrumentEvent extends Model
             }
         });
     }
-
 }
-

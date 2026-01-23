@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Orchid;
 
 use App\Models\Instrument;
-use App\Models\InstrumentEvent;
 use Orchid\Platform\Dashboard;
 use Orchid\Platform\ItemPermission;
 use Orchid\Platform\OrchidServiceProvider;
@@ -32,17 +31,17 @@ class PlatformProvider extends OrchidServiceProvider
     public function menu(): array
     {
         return [
-            Menu::make('Intrumentos')
+            Menu::make('Instrumentos')
                 ->icon('dropbox')
-                ->title('Instrumentos y Actualizacion de Fechas')
+                ->title('Instrumentos y Actualización de Fechas')
                 ->list([
                     Menu::make('Altas, baja, cambio INSTRUMENTOS')
                         ->icon('bs.tools')
                         ->route('platform.instruments.list'),
-                    Menu::make('Actualizar fecha CALIBRACION')
+                    Menu::make('Actualizar fecha CALIBRACIÓN')
                         ->icon('bs.speedometer')
                         ->route('platform.instrument_events.global'),
-                    Menu::make('Actualizar fecha VALIDACION')
+                    Menu::make('Actualizar fecha VALIDACIÓN')
                         ->icon('bs.check-square')
                         ->route('platform.instrument_events.global'),
                     Menu::make('Actualizar fecha MANTENIMIENTO')
@@ -54,15 +53,15 @@ class PlatformProvider extends OrchidServiceProvider
                 ->icon('bs.list-nested')
                 ->title('Listado Instrumentos')
                 ->list([
-                    Menu::make('Instrumentos CRITICOS')
+                    Menu::make('Instrumentos CRÍTICOS')
                         ->icon('bs.exclamation-diamond')
                         ->route('platform.instruments.list')
-                        ->badge(fn () => Instrument::count()),
+                        ->badge(fn () => Instrument::where('types_of_criticality', 'CRITICO')->count()),
 
-                    Menu::make('Instrumentos NO CRITICOS')
+                    Menu::make('Instrumentos NO CRÍTICOS')
                         ->icon('bs.slash-circle')
                         ->route('platform.instrument_events.global')
-                        ->badge(fn () => InstrumentEvent::count()),
+                        ->badge(fn () => Instrument::where('types_of_criticality', 'NO_CRITICO')->count()),
                 ]),
 
             Menu::make('ETIQUETAS')
@@ -74,9 +73,9 @@ class PlatformProvider extends OrchidServiceProvider
                         ->route('platform.instruments.list'),
                 ]),
 
-            Menu::make('Reporteria CALIBRACION')
+            Menu::make('Reportería CALIBRACION')
                 ->icon('bs.clipboard-data')
-                ->title('Reporteria')
+                ->title('Reportería')
                 ->list([
                     Menu::make('Produccion')
                         ->icon('bs.book')
@@ -101,10 +100,10 @@ class PlatformProvider extends OrchidServiceProvider
                 ]),
 
             // ===== VERIFICACION =====
-            Menu::make('VERIFICACION')
+            Menu::make('VERIFICACIÓN')
                 ->icon('bs.check2-square')
                 ->list([
-                    Menu::make('Produccion')
+                    Menu::make('Producción')
                         ->icon('bs.book')
                         ->route('platform.reporter', [
                             'tipo' => 'verificacion',
@@ -130,7 +129,7 @@ class PlatformProvider extends OrchidServiceProvider
             Menu::make('MANTENIMIENTO')
                 ->icon('bs.tools')
                 ->list([
-                    Menu::make('Produccion')
+                    Menu::make('Producción')
                         ->icon('bs.book')
                         ->route('platform.reporter', [
                             'tipo' => 'mantenimiento',

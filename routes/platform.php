@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Orchid\Screens\Calibration\CalibrationEditScreen;
 use App\Orchid\Screens\Calibration\CalibrationGlobalListScreen;
-use App\Orchid\Screens\Calibration\CalibrationListScreen;
 use App\Orchid\Screens\Examples\ExampleActionsScreen;
 use App\Orchid\Screens\Examples\ExampleCardsScreen;
 use App\Orchid\Screens\Examples\ExampleChartsScreen;
@@ -21,10 +19,7 @@ use App\Orchid\Screens\Instruments\InstrumentEditScreen;
 use App\Orchid\Screens\Instruments\InstrumentListScreen;
 use App\Orchid\Screens\Instruments\InstrumentShowScreen;
 // === Instrumentos ===
-use App\Orchid\Screens\Items\CatalogItemEditScreen;
-use App\Orchid\Screens\Items\CatalogItemListScreen;
 // === Eventos de Instrumento (Calibración / Validación / Mantenimiento) ===
-use App\Orchid\Screens\Items\CatalogItemShowScreen;
 use App\Orchid\Screens\PlatformScreen;
 use App\Orchid\Screens\Reporter\ReporterScreen;
 use App\Orchid\Screens\Role\RoleEditScreen;
@@ -50,7 +45,10 @@ use Tabuna\Breadcrumbs\Trail;
 
 // Main
 Route::screen('/main', PlatformScreen::class)
-    ->name('platform.main');
+    ->name('platform.main')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.index')
+        ->push('Main', route('platform.main')));
 
 // Platform > Profile
 Route::screen('profile', UserProfileScreen::class)
@@ -118,60 +116,40 @@ Route::screen('/examples/grid', ExampleGridScreen::class)->name('platform.exampl
 Route::screen('/examples/charts', ExampleChartsScreen::class)->name('platform.example.charts');
 Route::screen('/examples/cards', ExampleCardsScreen::class)->name('platform.example.cards');
 
-// Route::screen('idea', Idea::class, 'platform.screens.idea');
-
-// Listado de ítems (ya lo tienes)
-Route::screen('catalog-items', CatalogItemListScreen::class)
-    ->name('platform.catalog_items');
-
-Route::screen('catalog-items/create', CatalogItemEditScreen::class)
-    ->name('platform.catalog_items.create');
-
-Route::screen('catalog-items/{catalogItem}', CatalogItemEditScreen::class)
-    ->name('platform.catalog_items.edit');
-
-Route::screen('catalog-items/{catalogItem}/view', CatalogItemShowScreen::class)
-    ->name('platform.catalog_items.view');
-
 // === Calibrations ===
 Route::screen('calibrations', CalibrationGlobalListScreen::class)
     ->name('platform.calibrations');
-
-// === Calibrations nested ===
-Route::screen('catalog-items/{catalogItem}/calibrations', CalibrationListScreen::class)
-    ->name('platform.catalog_items.calibrations');
-
-Route::screen('catalog-items/{catalogItem}/calibrations/create', CalibrationEditScreen::class)
-    ->name('platform.catalog_items.calibrations.create');
-
-Route::screen('catalog-items/{catalogItem}/calibrations/{calibration}', CalibrationEditScreen::class)
-    ->name('platform.catalog_items.calibrations.edit');
 
 // -----------------------------------------------------
 // 📦 Catálogo de Instrumentos
 // -----------------------------------------------------
 
 Route::screen('instruments', InstrumentListScreen::class)
-    ->name('platform.instruments.list');
-
-Route::screen('instruments/create', InstrumentEditScreen::class)
-    ->name('platform.instruments.create');
-
-Route::screen('instruments/{instrument}', InstrumentEditScreen::class)
-    ->name('platform.instruments.edit');
-
-Route::screen('instruments/{instrument}/view', InstrumentShowScreen::class)
-    ->name('platform.instruments.view');
-
-// Instrumentos
-Route::screen('instruments', InstrumentListScreen::class) // Cambia al nombre real de tu Screen
     ->name('platform.instruments.list')
     ->breadcrumbs(fn (Trail $trail) => $trail
         ->parent('platform.main')
         ->push(__('Instrumentos'), route('platform.instruments.list')));
 
-Route::screen('instruments/{instrument}/events/create', InstrumentEventEditScreen::class)
-    ->name('platform.instruments.events.create');
+Route::screen('instruments/create', InstrumentEditScreen::class)
+    ->name('platform.instruments.create')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.instruments.list')
+        ->push(__('Crear'), route('platform.instruments.create')));
+
+Route::screen('instruments/{instrument}', InstrumentEditScreen::class)
+    ->name('platform.instruments.edit')
+    ->breadcrumbs(fn (Trail $trail, $instrument) => $trail
+        ->parent('platform.instruments.list')
+        ->push(__('Editar').' #'.$instrument->id, route('platform.instruments.edit', $instrument)));
+
+Route::screen('instruments/{instrument}/view', InstrumentShowScreen::class)
+    ->name('platform.instruments.view')
+    ->breadcrumbs(fn (Trail $trail, $instrument) => $trail
+        ->parent('platform.instruments.list')
+        ->push(__('Ver').' #'.$instrument->id, route('platform.instruments.view', $instrument)));
+
+/*Route::screen('instruments/{instrument}/events/create', InstrumentEventEditScreen::class)
+    ->name('platform.instruments.events.create');*/
 
 // Reportería Dinámica (tipo y area)
 Route::screen('reporter/{tipo}/{area}', ReporterScreen::class)
@@ -215,7 +193,7 @@ Route::screen('instrument-events-global', InstrumentEventGlobalScreen::class)
 */
 
 // Reportería Dinámica (tipo y area)
-Route::screen('reporter/{tipo}/{area}', \App\Orchid\Screens\Reporter\ReporterScreen::class)
+Route::screen('reporter/{tipo}/{area}', ReporterScreen::class)
     ->name('platform.reporter')
     ->breadcrumbs(fn (Trail $trail, $tipo, $area) => $trail
         ->parent('platform.index')
