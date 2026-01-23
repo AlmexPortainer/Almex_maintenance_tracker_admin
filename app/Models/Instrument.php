@@ -42,6 +42,9 @@ class Instrument extends Model
         'next_maintenance_date',
         'is_operational',
         'observations',
+        'calibration_periodicity_days',
+        'validation_periodicity_days',
+        'maintenance_periodicity_days',
     ];
 
     protected $casts = [
@@ -54,16 +57,19 @@ class Instrument extends Model
         'next_validation_date' => 'date',
         'last_maintenance_date' => 'date',
         'next_maintenance_date' => 'date',
+        'calibration_periodicity_days' => 'integer',
+        'validation_periodicity_days' => 'integer',
+        'maintenance_periodicity_days' => 'integer',
     ];
 
     protected $allowedSorts = [
         'name', 'type', 'department', 'location', 'brand', 'model',
-        'types_of_criticality', 'level_of_criticality', 'next_calibration_date'
+        'types_of_criticality', 'level_of_criticality', 'next_calibration_date',
     ];
 
     protected $allowedFilters = [
         'name', 'type', 'department', 'location', 'brand', 'model',
-        'types_of_criticality', 'level_of_criticality', 'is_operational'
+        'types_of_criticality', 'level_of_criticality', 'is_operational',
     ];
 
     // 🔗 Relación general con eventos (calibraciones, validaciones, mantenimientos)

@@ -4,11 +4,10 @@ namespace App\Orchid\Screens\InstrumentEvents;
 
 use App\Models\Instrument;
 use App\Models\InstrumentEvent;
+use App\Orchid\Layouts\InstrumentEvents\InstrumentEventNextDateListener;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Orchid\Screen\Actions\Button;
-use Orchid\Screen\Fields\DateTimer;
-use Orchid\Screen\Fields\Input;
-use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Screen\Screen;
 use Orchid\Support\Facades\Alert;
@@ -43,49 +42,33 @@ class InstrumentEventEditScreen extends Screen
     public function layout(): array
     {
         return [
+            InstrumentEventNextDateListener::class,
+
             Layout::rows([
-                // 🔍 Selector con búsqueda de instrumentos
-                Select::make('instrumentEvent.instrument_id')
-                    ->fromQuery(Instrument::query(), 'name', 'id')
-                    ->title('Instrumento')
-                    ->help('Selecciona el instrumento al que pertenece este evento.')
-                    ->required(),
-
-                Select::make('instrumentEvent.event_type')
-                    ->options([
-                        'CALIBRACION' => '📏 Calibración',
-                        'VALIDACION' => '✅ Verificación',
-                        'MANTENIMIENTO' => '🛠️ Mantenimiento',
-                    ])
-                    ->title('Tipo de Evento')
-                    ->required(),
-
-                DateTimer::make('instrumentEvent.fecha_evento')
-                    ->title('Fecha del Evento')
-                    ->required(),
-
-                Input::make('instrumentEvent.responsable')
-                    ->title('Responsable'),
-
-                Input::make('instrumentEvent.reporte')
-                    ->title('Reporte'),
-
                 TextArea::make('instrumentEvent.resultados')
                     ->title('Resultados')
                     ->rows(3),
-
-                Select::make('instrumentEvent.adecuado')
-                    ->options([
-                        1 => '✅ Adecuado',
-                        0 => '❌ No adecuado',
-                    ])
-                    // ->empty('Seleccionar...', null)
-                    ->title('Evaluación'),
-
-                DateTimer::make('instrumentEvent.fecha_proxima')->title('Fecha Próxima'),
-                DateTimer::make('instrumentEvent.fecha_maxima')->title('Fecha Máxima'),
             ]),
         ];
+    }
+
+    private function getFrequencyDaysForEventType(Instrument $instrument, string $eventType): ?int
+    {
+        return match ($eventType) {
+            'CALIBRACION' => $instrument->calibration_periodicity_days,
+            'VALIDACION' => $instrument->validation_periodicity_days,
+            'MANTENIMIENTO' => $instrument->maintenance_periodicity_days,
+            default => null,
+        };
+    }
+
+    private function calculateFechaProxima(?string $fechaEvento, ?int $freqDays): ?Carbon
+    {
+        if (empty($fechaEvento) || $freqDays === null) {
+            return null;
+        }
+
+        return Carbon::parse($fechaEvento)->addDays((int) $freqDays);
     }
 
     public function save(Request $request, InstrumentEvent $instrumentEvent)
@@ -102,12 +85,23 @@ class InstrumentEventEditScreen extends Screen
             'instrumentEvent.fecha_maxima' => 'nullable|date',
         ]);
 
-        $instrumentEvent->fill($validated['instrumentEvent']);
+        $data = $validated['instrumentEvent'];
+
+        $instrument = Instrument::find($data['instrument_id']);
+        if ($instrument) {
+            $freqDays = $this->getFrequencyDaysForEventType($instrument, (string) $data['event_type']);
+            $fechaProxima = $this->calculateFechaProxima((string) $data['fecha_evento'], $freqDays);
+
+            if ($fechaProxima) {
+                $data['fecha_proxima'] = $fechaProxima;
+            }
+        }
+
+        $instrumentEvent->fill($data);
         $instrumentEvent->save();
 
         Alert::success('Evento guardado correctamente.');
 
-        // 🔁 Redirección inteligente según origen
         if ($instrumentEvent->instrument_id) {
             return redirect()->route('platform.instruments.view', $instrumentEvent->instrument_id);
         }
