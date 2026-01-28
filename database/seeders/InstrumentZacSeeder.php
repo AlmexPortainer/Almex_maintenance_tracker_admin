@@ -206,7 +206,7 @@ class InstrumentZacSeeder extends Seeder
         ];
 
         foreach ($instruments as $instrument) {
-            DB::table('intruments')->insert([
+            DB::table('instruments')->insert([
                 ...$instrument,
                 'created_at' => now(),
                 'updated_at' => now(),

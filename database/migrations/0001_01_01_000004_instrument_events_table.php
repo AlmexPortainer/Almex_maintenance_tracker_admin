@@ -12,13 +12,13 @@ return new class extends Migration
             $table->id();
 
             // Relación con el instrumento
-            $table->foreignId('instrument_id')->constrained('intruments')->cascadeOnDelete();
+            $table->foreignId('instrument_id')->constrained('instruments')->cascadeOnDelete();
 
             // Tipo de evento
             $table->enum('event_type', [
                 'CALIBRACION',
                 'VALIDACION',
-                'MANTENIMIENTO'
+                'MANTENIMIENTO',
             ]);
 
             // Datos comunes
@@ -37,7 +37,6 @@ return new class extends Migration
             $table->index(['instrument_id', 'event_type', 'fecha_evento']);
         });
     }
-
 
     public function down(): void
     {

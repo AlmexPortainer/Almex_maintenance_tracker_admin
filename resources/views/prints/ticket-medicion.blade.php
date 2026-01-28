@@ -248,7 +248,7 @@
         <div class="label">Equipo</div>
         <div class="value">{{ $equipo }}</div>
         <div class="ticket-status ticket-status--{{ $apto ? 'apto' : 'no-apto' }}">
-            {{ $apto ? '✅ APTO' : '⚠️ NO APTO' }}
+            {{ $apto ? 'APTO' : 'NO APTO' }}
         </div>
     </div>
 
@@ -280,27 +280,27 @@
         <tbody>
         <tr>
             <td class="row-title">Última</td>
-            <td>28-11-1991</td>
-            <td>28-11-1991</td>
-            <td>28-11-1991</td>
+            <td>{{ $cal_ultima ?? '—' }}</td>
+            <td>{{ $val_ultima ?? '—' }}</td>
+            <td>{{ $mnt_ultima ?? '—' }}</td>
         </tr>
         <tr>
             <td class="row-title">Próxima</td>
-            <td>28-11-1991</td>
-            <td>28-11-1991</td>
-            <td>28-11-1991</td>
+            <td>{{ $cal_proxima ?? '—' }}</td>
+            <td>{{ $val_proxima ?? '—' }}</td>
+            <td>{{ $mnt_proxima ?? '—' }}</td>
         </tr>
         <tr>
             <td class="row-title">Quién aplicó</td>
-            <td>28-11-1991</td>
-            <td>28-11-1991</td>
-            <td>28-11-1991</td>
+            <td>{{ $cal_usuario ?? '—' }}</td>
+            <td>{{ $val_usuario ?? '—' }}</td>
+            <td>{{ $mnt_usuario ?? '—' }}</td>
         </tr>
         <tr class="row-requiere">
             <td class="row-title">REQUIERE</td>
-            <td>SI / NO</td>
-            <td>SI / NO</td>
-            <td>SI / NO</td>
+            <td>{{ $cal_requiere ? 'SI' : 'NO' }}</td>
+            <td>{{ $val_requiere ? 'SI' : 'NO' }}</td>
+            <td>{{ $mnt_requiere ? 'SI' : 'NO' }}</td>
         </tr>
         </tbody>
     </table>
@@ -325,7 +325,7 @@
         <div class="label">Equipo</div>
         <div class="value">{{ $equipo }}</div>
         <div class="ticket-status ticket-status--{{ $apto ? 'apto' : 'no-apto' }}">
-            {{ $apto ? '✅ APTO' : '⚠️ NO APTO' }}
+            {{ $apto ? 'APTO' : 'NO APTO' }}
         </div>
     </div>
 
@@ -356,7 +356,6 @@
         </div>
     </div>
 
-
     <div class="ticket-footer">
         <div class="ticket-footer-left">
             <img src="{{ asset('assets/logos/Logo_ALMEX_SVG.svg') }}" alt="ALMEX" class="ticket-logo">
@@ -367,6 +366,5 @@
     </div>
 
 </div>
-
 </body>
 </html>

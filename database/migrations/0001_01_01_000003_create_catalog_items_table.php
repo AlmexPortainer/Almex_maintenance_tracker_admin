@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         // INSTRUMENTO
-        Schema::create('intruments', function (Blueprint $table) {
+        Schema::create('instruments', function (Blueprint $table) {
             $table->id();
 
             $table->string('name')->nullable();
