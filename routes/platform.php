@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Orchid\Screens\Calibration\CalibrationGlobalListScreen;
 use App\Orchid\Screens\Examples\ExampleActionsScreen;
 use App\Orchid\Screens\Examples\ExampleCardsScreen;
 use App\Orchid\Screens\Examples\ExampleChartsScreen;
@@ -12,22 +11,20 @@ use App\Orchid\Screens\Examples\ExampleGridScreen;
 use App\Orchid\Screens\Examples\ExampleLayoutsScreen;
 use App\Orchid\Screens\Examples\ExampleScreen;
 use App\Orchid\Screens\Examples\ExampleTextEditorsScreen;
+use App\Orchid\Screens\InstrumentEvents\InstrumentEventCreateScreen;
 use App\Orchid\Screens\InstrumentEvents\InstrumentEventEditScreen;
 use App\Orchid\Screens\InstrumentEvents\InstrumentEventListScreen;
 use App\Orchid\Screens\InstrumentEvents\InstrumentEventShowScreen;
 use App\Orchid\Screens\Instruments\InstrumentEditScreen;
 use App\Orchid\Screens\Instruments\InstrumentListScreen;
 use App\Orchid\Screens\Instruments\InstrumentShowScreen;
-// === Instrumentos ===
-// === Eventos de Instrumento (Calibración / Validación / Mantenimiento) ===
+use App\Orchid\Screens\Instruments\InstrumentTicketScreen;
 use App\Orchid\Screens\PlatformScreen;
 use App\Orchid\Screens\Reporter\ReporterScreen;
 use App\Orchid\Screens\Role\RoleEditScreen;
-// === Instrumentos ===
 use App\Orchid\Screens\Role\RoleListScreen;
 use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
-// === Eventos de Instrumento (Calibración / Validación / Mantenimiento) ===
 use App\Orchid\Screens\User\UserProfileScreen;
 use Illuminate\Support\Facades\Route;
 use Tabuna\Breadcrumbs\Trail;
@@ -43,63 +40,70 @@ use Tabuna\Breadcrumbs\Trail;
 |
 */
 
-// Main
+// -----------------------------------------------------
+// 🧭 Main / Profile
+// -----------------------------------------------------
+
 Route::screen('/main', PlatformScreen::class)
     ->name('platform.main')
     ->breadcrumbs(fn (Trail $trail) => $trail
         ->parent('platform.index')
         ->push('Main', route('platform.main')));
 
-// Platform > Profile
 Route::screen('profile', UserProfileScreen::class)
     ->name('platform.profile')
     ->breadcrumbs(fn (Trail $trail) => $trail
         ->parent('platform.index')
         ->push(__('Profile'), route('platform.profile')));
 
-// Platform > System > Users > User
-Route::screen('users/{user}/edit', UserEditScreen::class)
-    ->name('platform.systems.users.edit')
-    ->breadcrumbs(fn (Trail $trail, $user) => $trail
-        ->parent('platform.systems.users')
-        ->push($user->name, route('platform.systems.users.edit', $user)));
+// -----------------------------------------------------
+// 🔐 System: Users
+// -----------------------------------------------------
 
-// Platform > System > Users > Create
-Route::screen('users/create', UserEditScreen::class)
-    ->name('platform.systems.users.create')
-    ->breadcrumbs(fn (Trail $trail) => $trail
-        ->parent('platform.systems.users')
-        ->push(__('Create'), route('platform.systems.users.create')));
-
-// Platform > System > Users
 Route::screen('users', UserListScreen::class)
     ->name('platform.systems.users')
     ->breadcrumbs(fn (Trail $trail) => $trail
         ->parent('platform.index')
         ->push(__('Users'), route('platform.systems.users')));
 
-// Platform > System > Roles > Role
-Route::screen('roles/{role}/edit', RoleEditScreen::class)
-    ->name('platform.systems.roles.edit')
-    ->breadcrumbs(fn (Trail $trail, $role) => $trail
-        ->parent('platform.systems.roles')
-        ->push($role->name, route('platform.systems.roles.edit', $role)));
-
-// Platform > System > Roles > Create
-Route::screen('roles/create', RoleEditScreen::class)
-    ->name('platform.systems.roles.create')
+Route::screen('users/create', UserEditScreen::class)
+    ->name('platform.systems.users.create')
     ->breadcrumbs(fn (Trail $trail) => $trail
-        ->parent('platform.systems.roles')
-        ->push(__('Create'), route('platform.systems.roles.create')));
+        ->parent('platform.systems.users')
+        ->push(__('Create'), route('platform.systems.users.create')));
 
-// Platform > System > Roles
+Route::screen('users/{user}/edit', UserEditScreen::class)
+    ->name('platform.systems.users.edit')
+    ->breadcrumbs(fn (Trail $trail, $user) => $trail
+        ->parent('platform.systems.users')
+        ->push($user->name, route('platform.systems.users.edit', $user)));
+
+// -----------------------------------------------------
+// 🔐 System: Roles
+// -----------------------------------------------------
+
 Route::screen('roles', RoleListScreen::class)
     ->name('platform.systems.roles')
     ->breadcrumbs(fn (Trail $trail) => $trail
         ->parent('platform.index')
         ->push(__('Roles'), route('platform.systems.roles')));
 
-// Example...
+Route::screen('roles/create', RoleEditScreen::class)
+    ->name('platform.systems.roles.create')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.systems.roles')
+        ->push(__('Create'), route('platform.systems.roles.create')));
+
+Route::screen('roles/{role}/edit', RoleEditScreen::class)
+    ->name('platform.systems.roles.edit')
+    ->breadcrumbs(fn (Trail $trail, $role) => $trail
+        ->parent('platform.systems.roles')
+        ->push($role->name, route('platform.systems.roles.edit', $role)));
+
+// -----------------------------------------------------
+// 🧪 Examples
+// -----------------------------------------------------
+
 Route::screen('example', ExampleScreen::class)
     ->name('platform.example')
     ->breadcrumbs(fn (Trail $trail) => $trail
@@ -116,12 +120,19 @@ Route::screen('/examples/grid', ExampleGridScreen::class)->name('platform.exampl
 Route::screen('/examples/charts', ExampleChartsScreen::class)->name('platform.example.charts');
 Route::screen('/examples/cards', ExampleCardsScreen::class)->name('platform.example.cards');
 
-// === Calibrations ===
-Route::screen('calibrations', CalibrationGlobalListScreen::class)
-    ->name('platform.calibrations');
-
 // -----------------------------------------------------
 // 📦 Catálogo de Instrumentos
+// -----------------------------------------------------
+
+// 🔹 ANEXOS / ESPECIALES (SIEMPRE ARRIBA)
+Route::screen('instruments/tickets', InstrumentTicketScreen::class)
+    ->name('platform.instruments.tickets')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.instruments.list')
+        ->push(__('Tickets')));
+
+// -----------------------------------------------------
+// 📦 CRUD Instrumentos
 // -----------------------------------------------------
 
 Route::screen('instruments', InstrumentListScreen::class)
@@ -134,67 +145,48 @@ Route::screen('instruments/create', InstrumentEditScreen::class)
     ->name('platform.instruments.create')
     ->breadcrumbs(fn (Trail $trail) => $trail
         ->parent('platform.instruments.list')
-        ->push(__('Crear'), route('platform.instruments.create')));
-
-Route::screen('instruments/{instrument}', InstrumentEditScreen::class)
-    ->name('platform.instruments.edit')
-    ->breadcrumbs(fn (Trail $trail, $instrument) => $trail
-        ->parent('platform.instruments.list')
-        ->push(__('Editar').' #'.$instrument->id, route('platform.instruments.edit', $instrument)));
+        ->push(__('Crear')));
 
 Route::screen('instruments/{instrument}/view', InstrumentShowScreen::class)
     ->name('platform.instruments.view')
     ->breadcrumbs(fn (Trail $trail, $instrument) => $trail
         ->parent('platform.instruments.list')
-        ->push(__('Ver').' #'.$instrument->id, route('platform.instruments.view', $instrument)));
+        ->push(__('Ver').' #'.$instrument->id));
 
-/*Route::screen('instruments/{instrument}/events/create', InstrumentEventEditScreen::class)
-    ->name('platform.instruments.events.create');*/
-
-// Reportería Dinámica (tipo y area)
-Route::screen('reporter/{tipo}/{area}', ReporterScreen::class)
-    ->name('platform.reporter')
-    ->breadcrumbs(fn (Trail $trail, $tipo, $area) => $trail
-        ->parent('platform.main')
-        ->push(ucfirst((string) $tipo).' - '.ucfirst((string) $area)));
+Route::screen('instruments/{instrument}', InstrumentEditScreen::class)
+    ->name('platform.instruments.edit')
+    ->breadcrumbs(fn (Trail $trail, $instrument) => $trail
+        ->parent('platform.instruments.view')
+        ->push(__('Editar').' #'.$instrument->id));
 
 // -----------------------------------------------------
-// ⚙️ Eventos de Instrumento (Global y Anidados)
+// ⚙️ Eventos de Instrumento
 // -----------------------------------------------------
-
-// 🌍 Listado global de todos los eventos (calibraciones, validaciones, mantenimientos)
 Route::screen('instrument-events', InstrumentEventListScreen::class)
     ->name('platform.instrument_events.global');
 
-Route::screen('instrument-events/create', InstrumentEventEditScreen::class)
+Route::screen('instrument-events/create/{event_type}', InstrumentEventCreateScreen::class)
     ->name('platform.instrument_events.create');
-
-// ✏️ Editar un evento existente
-Route::screen('instruments/{instrument}/events/{instrumentEvent}', InstrumentEventEditScreen::class)
-    ->name('platform.instruments.events.edit');
 
 Route::screen('instrument-events/{instrumentEvent}/view', InstrumentEventShowScreen::class)
     ->name('platform.instrument_events.view');
 
-// 📑 Listado de eventos de un instrumento específico
 Route::screen('instruments/{instrument}/events', InstrumentEventListScreen::class)
     ->name('platform.instruments.events');
 
-// ➕ Crear evento para un instrumento
-Route::screen('instruments/{instrument}/events/create', InstrumentEventEditScreen::class)
-    ->name('platform.instruments.events.create');
+Route::screen('instruments/{instrument}/events/{instrumentEvent}', InstrumentEventEditScreen::class)
+    ->name('platform.instruments.events.edit');
 
-/*
-Route::screen('instrument-events-global', InstrumentEventGlobalScreen::class)
-    ->name('platform.instrument_events.global')
-    ->breadcrumbs(fn (Trail $trail) => $trail
-        ->parent('platform.main')
-        ->push(__('Actualización Global'), route('platform.instrument_events.global')));
-*/
+// -----------------------------------------------------
+// 📊 Reportería Dinámica (tipo y area)
+// -----------------------------------------------------
 
-// Reportería Dinámica (tipo y area)
 Route::screen('reporter/{tipo}/{area}', ReporterScreen::class)
     ->name('platform.reporter')
     ->breadcrumbs(fn (Trail $trail, $tipo, $area) => $trail
-        ->parent('platform.index')
+        ->parent('platform.main')
         ->push(ucfirst((string) $tipo).' - '.ucfirst((string) $area)));
+
+// -----------------------------------------------------
+// 🎫 Impresion de tickets
+// -----------------------------------------------------

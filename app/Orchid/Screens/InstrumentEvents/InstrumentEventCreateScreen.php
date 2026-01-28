@@ -13,7 +13,7 @@ use Orchid\Screen\Screen;
 use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
 
-class InstrumentEventEditScreen extends Screen
+class InstrumentEventCreateScreen extends screen
 {
     public $name = 'Evento de Instrumento';
 
@@ -21,13 +21,10 @@ class InstrumentEventEditScreen extends Screen
 
     public $instrumentEvent;
 
-    public function query(InstrumentEvent $instrumentEvent, string $eventType): array
+    public function query(string $event_type): iterable
     {
-
         return [
-            'instrumentEvent' => $instrumentEvent->exists
-                ? $instrumentEvent->load('instrument')
-                : $instrumentEvent,
+            'eventType' => $event_type,
         ];
     }
 

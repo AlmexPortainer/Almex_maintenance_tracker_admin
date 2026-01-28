@@ -35,18 +35,26 @@ class PlatformProvider extends OrchidServiceProvider
                 ->icon('dropbox')
                 ->title('Instrumentos y Actualización de Fechas')
                 ->list([
+
                     Menu::make('Altas, baja, cambio INSTRUMENTOS')
                         ->icon('bs.tools')
-                        ->route('platform.instruments.list'),
+                        ->route('platform.instruments.create'),
+
                     Menu::make('Actualizar fecha CALIBRACIÓN')
                         ->icon('bs.speedometer')
-                        ->route('platform.instrument_events.global'),
+                        ->route('platform.instrument_events.create', ['event_type' => 'CALIBRACION']),
+
                     Menu::make('Actualizar fecha VALIDACIÓN')
                         ->icon('bs.check-square')
-                        ->route('platform.instrument_events.global'),
+                        ->route('platform.instrument_events.create', [
+                            'event_type' => 'VALIDACION',
+                        ]),
+
                     Menu::make('Actualizar fecha MANTENIMIENTO')
                         ->icon('bs.nut-fill')
-                        ->route('platform.instrument_events.global'),
+                        ->route('platform.instrument_events.create', [
+                            'event_type' => 'MANTENIMIENTO',
+                        ]),
                 ]),
 
             Menu::make('Listado')
@@ -68,14 +76,9 @@ class PlatformProvider extends OrchidServiceProvider
                         ->badge(fn () => Instrument::where('types_of_criticality', 'NO_CRITICO')->count()),
                 ]),
 
-            Menu::make('ETIQUETAS')
-                ->icon('bs.clipboard')
-                ->title('Herramientas de etiquetas')
-                ->list([
-                    Menu::make('GENERAR ETIQUETAS')
-                        ->icon('bs.ticket')
-                        ->route('platform.instruments.list'),
-                ]),
+            Menu::make('Tickets de Instrumentos')
+                ->icon('bs.printer')
+                ->route('platform.instruments.tickets'),
 
             Menu::make('Reportería CALIBRACION')
                 ->icon('bs.clipboard-data')
