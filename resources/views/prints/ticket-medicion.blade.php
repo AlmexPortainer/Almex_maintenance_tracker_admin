@@ -53,9 +53,8 @@
            ================================================== */
         .ticket-80mm .row-equipo {
             display: grid;
-            grid-template-columns: 16mm 1fr 16mm;
+            grid-template-columns: 15mm 1fr 15mm;
             align-items: center;
-            column-gap: 1mm;
             margin-bottom: 1.5mm;
         }
 
@@ -68,7 +67,6 @@
         .ticket-80mm .row-equipo .value {
             font-size: 8px;
             border-bottom: 1px solid #000;
-            padding-left: 1mm;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -127,15 +125,33 @@
         }
 
         /* ===========================
-           FUERA DE SERVICIO
+           FUERA DE SERVICIO (2 SECCIONES)
            =========================== */
-        .ticket-80mm .fuera {
-            border: 1px solid #000;
+        .ticket-80mm .fuera-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2mm;
             padding: 3mm;
-            text-align: center;
-            font-size: 12px;
             font-weight: bold;
-            margin-top: 3mm;
+            box-sizing: border-box;
+        }
+
+        /* Izquierda */
+        .ticket-80mm .fuera-left {
+            text-align: center;
+            background-color: #000;
+            color: #fff;
+            border: 2px solid #000;
+
+            font-size: 12px;
+            line-height: 1.2;
+        }
+
+        /* Derecha */
+        .ticket-80mm .fuera-right {
+            font-size: 7px;
+            line-height: 1.2;
+            text-align: left;
         }
 
         /* ===========================
@@ -173,15 +189,12 @@
            FUERA DE SERVICIO (ALTO CONTRASTE)
            =========================== */
         .ticket-80mm .fuera {
-            background-color: #000; /* fondo negro */
-            color: #fff; /* texto blanco */
-            border: 2px solid #000; /* marco sólido */
             padding: 3mm;
             text-align: center;
             font-size: 24px;
             font-weight: bold;
             margin-top: 3mm;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
 
@@ -235,7 +248,7 @@
         <div class="label">Equipo</div>
         <div class="value">{{ $equipo }}</div>
         <div class="ticket-status ticket-status--{{ $apto ? 'apto' : 'no-apto' }}">
-            {{ $apto ? 'APTO' : 'NO APTO' }}
+            {{ $apto ? '✅ APTO' : '⚠️ NO APTO' }}
         </div>
     </div>
 
@@ -308,10 +321,12 @@
    TICKET FUERA DE SERVICIO
    ===================================================== --}}
 <div class="ticket-80mm ticket-print">
-
-    <div class="row">
+    <div class="row-equipo">
         <div class="label">Equipo</div>
         <div class="value">{{ $equipo }}</div>
+        <div class="ticket-status ticket-status--{{ $apto ? 'apto' : 'no-apto' }}">
+            {{ $apto ? '✅ APTO' : '⚠️ NO APTO' }}
+        </div>
     </div>
 
     <div class="row">
@@ -329,10 +344,18 @@
         <div class="value">{{ $codigo }}</div>
     </div>
 
-    <div class="fuera">
-        FUERA DE SERVICIO<br>
-        — NO USAR —
+    <div class="fuera fuera-grid">
+        <div class="fuera-left">
+            FUERA DE SERVICIO<br>
+            — NO USAR —
+        </div>
+        <div class="fuera-right">
+            NOTA:<br>
+            Ver al reverso de esta etiqueta<br>
+            la causa o motivo →
+        </div>
     </div>
+
 
     <div class="ticket-footer">
         <div class="ticket-footer-left">
