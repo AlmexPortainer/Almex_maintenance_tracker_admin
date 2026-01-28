@@ -93,4 +93,11 @@ class Instrument extends Model
     {
         return $this->events()->where('event_type', 'MANTENIMIENTO');
     }
+
+    public function scopeCriticality($query, ?string $criticality)
+    {
+        if ($criticality) {
+            $query->where('types_of_criticality', $criticality);
+        }
+    }
 }

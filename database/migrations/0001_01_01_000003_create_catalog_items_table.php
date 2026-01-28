@@ -59,7 +59,7 @@ return new class extends Migration
             $table->text('observations')->nullable();
 
             $table->timestamps();
-            $table->index(['name', 'type']);
+            $table->index(['name', 'type', 'types_of_criticality']);
         });
     }
 

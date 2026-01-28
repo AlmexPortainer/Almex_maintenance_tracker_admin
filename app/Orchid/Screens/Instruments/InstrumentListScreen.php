@@ -14,14 +14,16 @@ class InstrumentListScreen extends Screen
 
     public $description = 'Listado general de instrumentos con detalles y estado operativo.';
 
-    public function query(): array
+    public function query(): iterable
     {
         return [
-            'instruments' => Instrument::paginate(),
+            'instruments' => Instrument::criticality(
+                request('types_of_criticality')
+            )->paginate(),
         ];
     }
 
-    public function commandBar(): array
+    public function commandBar(): iterable
     {
         return [
             Link::make('Nuevo Instrumento')
@@ -44,9 +46,7 @@ class InstrumentListScreen extends Screen
                 TD::make('code', 'Código')->sort()->filter()
                     ->render(fn ($i) => Link::make($i->code)->route('platform.instruments.view', $i->id)),
                 TD::make('emt_value', 'E.M.T.'),
-
                 TD::make('calibration_periodicity_days', 'Periodo de calibracion'),
-
                 TD::make('file_manual', 'Instructivo'),
                 TD::make('updated_at', 'Actualizado')->render(fn ($i) => $i->updated_at->diffForHumans()),
             ]),
