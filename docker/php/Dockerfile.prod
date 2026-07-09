@@ -1,85 +1,92 @@
-# Stage 1: Build frontend assets
+# syntax=docker/dockerfile:1
+# ============================================================
+# Imagen de PRODUCCIÓN (monolito): nginx + php-fpm + queue + scheduler
+# Construida UNA vez en CI y publicada en GHCR. El server solo hace pull.
+# ============================================================
+
+# ------------------------------------------------------------
+# Stage 1: Assets frontend (Vite)
+# ------------------------------------------------------------
 FROM node:20-alpine AS node-builder
-
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm ci --only=production
-
+RUN npm ci
 COPY . .
 RUN npm run build
 
-# Stage 2: PHP Dependencies
+# ------------------------------------------------------------
+# Stage 2: Dependencias PHP (Composer, sin dev)
+# ------------------------------------------------------------
 FROM composer:2 AS composer-builder
-
 WORKDIR /app
-
-COPY composer*.json ./
+COPY composer.json composer.lock ./
 RUN composer install \
---no-dev \
---no-scripts \
---no-autoloader \
---prefer-dist \
---optimize-autoloader
-
+    --no-dev \
+    --no-scripts \
+    --no-autoloader \
+    --prefer-dist \
+    --optimize-autoloader
 COPY . .
 RUN composer dump-autoload --optimize --no-dev --classmap-authoritative
 
-# Stage 3: PHP Application
-FROM php:8.2-fpm-alpine
+# ------------------------------------------------------------
+# Stage 3: Runtime PHP-FPM + Nginx + Supervisor
+# ------------------------------------------------------------
+FROM php:8.4-fpm-alpine
 
-# Instalar dependencias del sistema
+# Dependencias de sistema (solo runtime) + extensiones PHP
 RUN apk add --no-cache \
-curl \
-libpng \
-oniguruma \
-libxml2 \
-libzip \
-mysql-client \
-supervisor \
-nginx
+        curl \
+        libpng \
+        oniguruma \
+        libxml2 \
+        libzip \
+        mysql-client \
+        supervisor \
+        nginx \
+    && apk add --no-cache --virtual .build-deps \
+        libpng-dev \
+        oniguruma-dev \
+        libxml2-dev \
+        libzip-dev \
+        linux-headers \
+        $PHPIZE_DEPS \
+    && docker-php-ext-configure zip \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache zip \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apk del .build-deps
 
-# Instalar extensiones PHP
-RUN apk add --no-cache --virtual .build-deps \
-libpng-dev \
-oniguruma-dev \
-libxml2-dev \
-libzip-dev \
-$PHPIZE_DEPS \
-&& docker-php-ext-configure zip \
-&& docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache zip \
-&& pecl install redis \
-&& docker-php-ext-enable redis \
-&& apk del .build-deps
-
-# Copiar configuraciones
-COPY docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
-COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
-COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
+# Configuraciones
+COPY docker/php/php.ini            /usr/local/etc/php/conf.d/custom.ini
+COPY docker/nginx/nginx.conf       /etc/nginx/nginx.conf
+COPY docker/nginx/default.prod.conf /etc/nginx/conf.d/default.conf
 COPY docker/supervisor/supervisord.conf /etc/supervisord.conf
 
 WORKDIR /var/www/html
 
-# Copiar vendor desde composer-builder
+# Dependencias ya construidas + código + assets compilados
 COPY --from=composer-builder --chown=www-data:www-data /app/vendor ./vendor
-
-# Copiar aplicación
 COPY --chown=www-data:www-data . .
-
-# Copiar assets compilados
 COPY --from=node-builder --chown=www-data:www-data /app/public/build ./public/build
 
-# Optimizaciones Laravel para producción
-RUN php artisan config:cache \
-&& php artisan route:cache \
-&& php artisan view:cache \
-&& php artisan event:cache
+# Directorios de runtime + permisos
+RUN mkdir -p \
+        storage/framework/sessions \
+        storage/framework/views \
+        storage/framework/cache \
+        storage/logs \
+        bootstrap/cache \
+        /var/log/supervisor \
+        /var/log/nginx \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
-# Establecer permisos
-RUN chown -R www-data:www-data /var/www/html \
-&& chmod -R 755 /var/www/html/storage \
-&& chmod -R 755 /var/www/html/bootstrap/cache
+# Entrypoint: prepara caché de Laravel con el entorno real en cada arranque
+COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint
+RUN chmod +x /usr/local/bin/entrypoint
 
 EXPOSE 80
 
+ENTRYPOINT ["entrypoint"]
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

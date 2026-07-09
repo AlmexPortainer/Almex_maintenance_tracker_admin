@@ -1,6 +1,13 @@
 version: "3.9"
 
-# Ancla de variables para servicios Laravel (app/queue/scheduler)
+# ============================================================
+# Stack de PRODUCCIÓN para Portainer.
+# La imagen se construye en GitHub Actions y se publica en GHCR.
+# Aquí NO se construye nada: solo se hace pull de la imagen ya lista.
+# Un único contenedor "app" corre nginx + php-fpm + queue + scheduler
+# (vía supervisor). MySQL y Redis viven fuera (shared_network).
+# ============================================================
+
 x-laravel-env: &laravel_env
   APP_NAME: ${APP_NAME}
   APP_ENV: ${APP_ENV}
@@ -16,8 +23,6 @@ x-laravel-env: &laravel_env
   PHP_MAX_EXECUTION_TIME: ${PHP_MAX_EXECUTION_TIME}
   PHP_POST_MAX_SIZE: ${PHP_POST_MAX_SIZE}
   PHP_UPLOAD_MAX_FILESIZE: ${PHP_UPLOAD_MAX_FILESIZE}
-  PHP_OPCACHE_VALIDATE_TIMESTAMPS: ${PHP_OPCACHE_VALIDATE_TIMESTAMPS}
-  XDEBUG_MODE: ${XDEBUG_MODE}
   DB_CONNECTION: ${DB_CONNECTION}
   DB_HOST: ${DB_HOST}
   DB_PORT: ${DB_PORT}
@@ -32,10 +37,6 @@ x-laravel-env: &laravel_env
   SESSION_PATH: ${SESSION_PATH}
   SESSION_DOMAIN: ${SESSION_DOMAIN}
   QUEUE_CONNECTION: ${QUEUE_CONNECTION}
-  QUEUE_SLEEP: ${QUEUE_SLEEP}
-  QUEUE_TRIES: ${QUEUE_TRIES}
-  QUEUE_MAX_TIME: ${QUEUE_MAX_TIME}
-  QUEUE_TIMEOUT: ${QUEUE_TIMEOUT}
   LOG_CHANNEL: ${LOG_CHANNEL}
   LOG_STACK: ${LOG_STACK}
   LOG_DEPRECATIONS_CHANNEL: ${LOG_DEPRECATIONS_CHANNEL}
@@ -57,120 +58,30 @@ x-laravel-env: &laravel_env
   REDIS_DB: ${REDIS_DB}
   REDIS_CACHE_DB: ${REDIS_CACHE_DB}
   REDIS_QUEUE_DB: ${REDIS_QUEUE_DB}
-  VITE_APP_NAME: ${VITE_APP_NAME}
-  NODE_ENV: ${NODE_ENV}
-  NGINX_CLIENT_MAX_BODY_SIZE: ${NGINX_CLIENT_MAX_BODY_SIZE}
-  NGINX_FASTCGI_READ_TIMEOUT: ${NGINX_FASTCGI_READ_TIMEOUT}
-  NGINX_WORKER_CONNECTIONS: ${NGINX_WORKER_CONNECTIONS}
-  SUPERVISOR_LOG_LEVEL: ${SUPERVISOR_LOG_LEVEL}
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile.portainer
-      args:
-        USER_ID: ${USER_ID:-1000}
-        GROUP_ID: ${GROUP_ID:-1000}
+    # Tag inyectado por el pipeline (APP_IMAGE). Por defecto: latest.
+    image: ${APP_IMAGE:-ghcr.io/almexwebapps/almex_maintenance_tracker_admin:latest}
     container_name: ${DOCKER_APP_CONTAINER:-almex_app}
     restart: unless-stopped
     working_dir: /var/www/html
     environment:
       <<: *laravel_env
-      PHP_OPCACHE_VALIDATE_TIMESTAMPS: "1"
+    ports:
+      - "${APP_PORT:-8083}:80"
     volumes:
-      - app-code:/var/www/html
+      # Solo persistimos storage (uploads, logs). El código vive en la imagen.
       - app-storage:/var/www/html/storage
     networks:
       - almex_network
       - shared_almex_network
-
-  web:
-    build:
-      context: ./docker/nginx
-      dockerfile: Dockerfile
-    container_name: ${DOCKER_WEB_CONTAINER:-almex_web}
-    restart: unless-stopped
-    ports:
-      - "${APP_PORT:-8083}:80"
-    volumes:
-      - app-code:/var/www/html:ro
-      - app-storage:/var/www/html/storage:rw
-    networks:
-      - almex_network
-      - shared_almex_network
-    depends_on:
-      - app
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 10s
-
-  npm:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile.portainer
-      args:
-        USER_ID: ${USER_ID:-1000}
-        GROUP_ID: ${GROUP_ID:-1000}
-    container_name: ${DOCKER_VITE_CONTAINER:-almex_vite}
-    working_dir: /var/www/html
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
-    ports:
-      - "${VITE_PORT:-5173}:5173"
-    environment:
-      NODE_ENV: ${NODE_ENV:-development}
-      VITE_APP_NAME: ${VITE_APP_NAME}
-    networks:
-      - almex_network
-      - shared_almex_network
-    depends_on:
-      - app
-
-  queue:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile.portainer
-      args:
-        USER_ID: ${USER_ID:-1000}
-        GROUP_ID: ${GROUP_ID:-1000}
-    container_name: ${DOCKER_QUEUE_CONTAINER:-almex_queue}
-    restart: unless-stopped
-    working_dir: /var/www/html
-    command: php artisan queue:work --sleep=${QUEUE_SLEEP:-3} --tries=${QUEUE_TRIES:-3} --max-time=${QUEUE_MAX_TIME:-3600} --timeout=${QUEUE_TIMEOUT:-300}
-    environment:
-      <<: *laravel_env
-    networks:
-      - almex_network
-      - shared_almex_network
-    depends_on:
-      - app
-    healthcheck:
-      test: ["CMD", "ps", "aux", "|", "grep", "[q]ueue:work"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  scheduler:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile.portainer
-      args:
-        USER_ID: ${USER_ID:-1000}
-        GROUP_ID: ${GROUP_ID:-1000}
-    container_name: ${DOCKER_SCHEDULER_CONTAINER:-almex_scheduler}
-    restart: unless-stopped
-    working_dir: /var/www/html
-    command: sh -c "while true; do php artisan schedule:run --verbose --no-interaction & sleep 60; done"
-    environment:
-      <<: *laravel_env
-    networks:
-      - almex_network
-      - shared_almex_network
-    depends_on:
-      - app
+      start_period: 20s
 
 networks:
   almex_network:
@@ -181,7 +92,5 @@ networks:
     name: shared_network
 
 volumes:
-  app-code:
-    driver: local
   app-storage:
     driver: local

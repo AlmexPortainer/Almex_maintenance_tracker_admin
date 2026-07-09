@@ -1,0 +1,40 @@
+# Control de versiones / IDE
+.git
+.gitignore
+.gitattributes
+.idea
+.vscode
+
+# Dependencias (se instalan dentro de la imagen)
+vendor
+node_modules
+
+# Entorno y secretos (NO deben entrar a la imagen)
+.env
+.env.*
+!.env.example
+
+# Build local de assets (se genera dentro de la imagen)
+public/build
+public/hot
+public/storage
+
+# Almacenamiento y caché de Laravel
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*.php
+
+# Docker / CI
+docker-compose*.yml
+Dockerfile*
+docker/**/Dockerfile*
+.github
+qodana.yaml
+
+# Tests y misc
+tests
+.phpunit.result.cache
+README.md
+docs
