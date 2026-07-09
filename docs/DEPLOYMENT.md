@@ -38,7 +38,7 @@ curl -o runner.tar.gz -L https://github.com/actions/runner/releases/latest/downl
 tar xzf runner.tar.gz
 
 # Registrar (usa la URL y token que da GitHub)
-./config.sh --url https://github.com/AlmexWebApps/Almex_maintenance_tracker_admin \
+./config.sh --url https://github.com/AlmexPortainer/Almex_maintenance_tracker_admin \
             --token <TOKEN_DE_GITHUB> \
             --labels self-hosted,linux \
             --unattended
@@ -93,7 +93,7 @@ Rollback: en Actions, re-ejecuta un run anterior (más simple), **o** en el
 server pineando un SHA viejo:
 
 ```bash
-APP_IMAGE=ghcr.io/almexwebapps/almex_maintenance_tracker_admin:<SHA_ANTERIOR> \
+APP_IMAGE=ghcr.io/almexportainer/almex_maintenance_tracker_admin:<SHA_ANTERIOR> \
   docker compose -f docker-compose.portainer.yml --env-file <tu-env> up -d
 ```
 

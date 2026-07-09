@@ -62,7 +62,7 @@ x-laravel-env: &laravel_env
 services:
   app:
     # Tag inyectado por el pipeline (APP_IMAGE). Por defecto: latest.
-    image: ${APP_IMAGE:-ghcr.io/almexwebapps/almex_maintenance_tracker_admin:latest}
+    image: ${APP_IMAGE:-ghcr.io/almexportainer/almex_maintenance_tracker_admin:latest}
     container_name: ${DOCKER_APP_CONTAINER:-almex_app}
     restart: unless-stopped
     working_dir: /var/www/html

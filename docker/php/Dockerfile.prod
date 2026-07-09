@@ -6,8 +6,11 @@
 
 # ------------------------------------------------------------
 # Stage 1: Assets frontend (Vite)
+# NOTA: glibc (bookworm), NO alpine. Tailwind v4 (@tailwindcss/oxide +
+# lightningcss) usa binarios nativos que fallan en musl/alpine.
+# Este stage es descartable: no afecta el tamaño de la imagen final.
 # ------------------------------------------------------------
-FROM node:20-alpine AS node-builder
+FROM node:20-bookworm-slim AS node-builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
