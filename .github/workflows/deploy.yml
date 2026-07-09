@@ -2,7 +2,7 @@ name: Build & Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [dev, main]
   workflow_dispatch:
 
 concurrency:
@@ -28,12 +28,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Normalizar nombre de imagen a minúsculas
+      - name: Calcular nombre y tags de imagen
         id: meta
         run: |
           IMAGE_LC=$(echo "${IMAGE}" | tr '[:upper:]' '[:lower:]')
-          echo "image_lc=${IMAGE_LC}" >> "$GITHUB_OUTPUT"
-          echo "image_ref=${IMAGE_LC}:${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          # Tag inmutable por commit + tag por rama (dev/main)
+          TAGS="${IMAGE_LC}:${GITHUB_SHA}
+          ${IMAGE_LC}:${GITHUB_REF_NAME}"
+          # 'latest' solo en main
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            TAGS="${TAGS}
+          ${IMAGE_LC}:latest"
+          fi
+          {
+            echo "image_ref=${IMAGE_LC}:${GITHUB_SHA}"
+            echo "tags<<EOF"
+            echo "${TAGS}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Login en GHCR
         uses: docker/login-action@v3
@@ -51,35 +63,38 @@ jobs:
           context: .
           file: docker/php/Dockerfile.prod
           push: true
-          tags: |
-            ${{ steps.meta.outputs.image_lc }}:latest
-            ${{ steps.meta.outputs.image_lc }}:${{ github.sha }}
+          tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   # ============================================================
   # 2) DEPLOY: corre en el self-hosted runner DENTRO del server.
-  #    No requiere webhook: el runner hace long-poll saliente a
-  #    GitHub y ejecuta el deploy localmente con docker directo.
+  #    Sin webhook: el runner hace long-poll saliente a GitHub.
+  #    El .env de producción viene de un secreto de GitHub, así
+  #    que NO hay que tocar el server para cambiar config.
   # ============================================================
   deploy:
     needs: build
-    runs-on: [self-hosted, linux]
+    runs-on: [self-hosted, Linux, X64, Portainer]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Login en GHCR (para pull de imagen privada)
+      - name: Login en GHCR (pull de imagen privada)
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Escribir .env desde secreto
+        env:
+          PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
+        run: printf '%s\n' "$PROD_ENV_FILE" > "$RUNNER_TEMP/almex.env"
+
       - name: Deploy stack
         env:
-          # Ruta al .env de producción persistente en el server.
-          ENV_FILE: ${{ secrets.PROD_ENV_PATH }}
+          ENV_FILE: ${{ runner.temp }}/almex.env
           APP_IMAGE: ${{ needs.build.outputs.image_ref }}
         run: |
           set -e
@@ -94,5 +109,9 @@ jobs:
           echo ">> Migraciones"
           APP_IMAGE=${APP_IMAGE} ${COMPOSE} exec -T app php artisan migrate --force
 
-          echo ">> Limpieza de imágenes viejas"
+          echo ">> Limpieza"
           docker image prune -f
+
+      - name: Borrar .env temporal
+        if: always()
+        run: rm -f "$RUNNER_TEMP/almex.env"

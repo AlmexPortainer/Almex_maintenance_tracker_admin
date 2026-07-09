@@ -1,12 +1,17 @@
 # Despliegue CI/CD (sin webhook)
 
-Flujo: **push a `main` → GitHub construye la imagen → self-hosted runner en el
-server hace el deploy**. El server nunca recibe conexiones entrantes; el runner
-hace *long-poll* saliente a GitHub, así que **no se necesita webhook** ni abrir
-puertos.
+Flujo: **push a `dev` o `main` → GitHub construye la imagen → self-hosted runner
+en el server hace el deploy**. El server nunca recibe conexiones entrantes; el
+runner hace *long-poll* saliente a GitHub, así que **no se necesita webhook** ni
+abrir puertos. Toda la config (incluido el `.env`) vive en el repo/secrets: para
+cambiar algo solo tocas el repo, nunca el server.
+
+- Iteras en la rama **`dev`** → cada push despliega para probar.
+- Cuando quede estable, **merge a `main`** → despliega la versión estable.
+- Ambas ramas usan el mismo `.env` (secreto `PROD_ENV_FILE`).
 
 ```
- push main
+ push dev / main
     │
     ├─ Job "build" (runner de GitHub, en la nube)
     │     docker build  →  push a ghcr.io  (imagen inmutable :SHA + :latest)
@@ -54,29 +59,23 @@ Verifica: `docker compose version` debe responder como ese usuario.
 
 ---
 
-## 2. Colocar el `.env` de producción en el server (una vez)
+## 2. Cargar el `.env` de producción como secreto (una vez)
 
-El `.env` **no** está en el repo ni en la imagen. Déjalo persistente, por ejemplo:
+El `.env` **no** está en el repo ni en la imagen: vive como secreto de GitHub.
+El action lo escribe en un archivo temporal durante el deploy y lo borra al
+final. Para cambiar config solo editas el secreto — no tocas el server.
 
-```bash
-sudo mkdir -p /opt/almex
-sudo nano /opt/almex/.env        # pega el .env de producción real
-```
+**repo → Settings → Secrets and variables → Actions → New repository secret:**
 
-Debe incluir `APP_KEY`, credenciales de `DB_*`, `REDIS_*`, `APP_PORT`, etc.
+| Secret           | Valor                                                        |
+|------------------|--------------------------------------------------------------|
+| `PROD_ENV_FILE`  | El contenido **completo** del `.env` de producción (pega todo)|
 
----
+Debe incluir `APP_KEY`, `DB_*`, `REDIS_*`, `APP_PORT`, etc. Para cambiar una
+variable: editas el secreto y haces push (o corres el workflow manual).
 
-## 3. Secrets del repositorio
-
-**repo → Settings → Secrets and variables → Actions:**
-
-| Secret            | Valor                                  |
-|-------------------|----------------------------------------|
-| `PROD_ENV_PATH`   | `/opt/almex/.env` (ruta al env del server) |
-
-`GITHUB_TOKEN` es automático (no hay que crearlo). Da permiso de `packages:write`
-para publicar en GHCR — ya está declarado en el workflow.
+`GITHUB_TOKEN` es automático (no hay que crearlo); da `packages:write` para
+publicar/leer en GHCR — ya está declarado en el workflow.
 
 > La imagen en GHCR es privada por defecto. El runner hace `docker login ghcr.io`
 > con `GITHUB_TOKEN` dentro del job, así que el pull funciona sin config extra.
@@ -84,16 +83,18 @@ para publicar en GHCR — ya está declarado en el workflow.
 
 ---
 
-## 4. Primer despliegue
+## 3. Primer despliegue
 
-Haz push a `main` (o corre el workflow manual desde la pestaña Actions). El job
-`build` publica la imagen y `deploy` la levanta en el server.
+Haz push a `dev` (para probar) o `main`, o corre el workflow manual desde la
+pestaña **Actions**. El job `build` publica la imagen y `deploy` la levanta en
+el server. Flujo normal: iteras en `dev` → cuando queda bien, merge a `main`.
 
-Rollback: en Actions, re-ejecuta un run anterior, **o** en el server:
+Rollback: en Actions, re-ejecuta un run anterior (más simple), **o** en el
+server pineando un SHA viejo:
 
 ```bash
 APP_IMAGE=ghcr.io/almexwebapps/almex_maintenance_tracker_admin:<SHA_ANTERIOR> \
-  docker compose -f docker-compose.portainer.yml --env-file /opt/almex/.env up -d
+  docker compose -f docker-compose.portainer.yml --env-file <tu-env> up -d
 ```
 
 Cada imagen queda taggeada por `:SHA`, así que el rollback es inmediato.
