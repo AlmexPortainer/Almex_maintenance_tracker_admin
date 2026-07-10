@@ -3,6 +3,7 @@
 namespace App\Orchid\Screens\InstrumentEvents;
 
 use App\Models\InstrumentEvent;
+use Orchid\Screen\Actions\DropDown;
 use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Screen;
 use Orchid\Screen\TD;
@@ -25,10 +26,16 @@ class InstrumentEventListScreen extends Screen
     public function commandBar(): array
     {
         return [
-            Link::make('➕ Registrar Evento')
+            DropDown::make('➕ Registrar Evento')
                 ->icon('plus')
-                ->route('platform.instrument_events.create'),
-            // todo error en la pagina cargar esta ruta0
+                ->list([
+                    Link::make('📏 Calibración')
+                        ->route('platform.instrument_events.create', 'CALIBRACION'),
+                    Link::make('✅ Verificación')
+                        ->route('platform.instrument_events.create', 'VALIDACION'),
+                    Link::make('🛠️ Mantenimiento')
+                        ->route('platform.instrument_events.create', 'MANTENIMIENTO'),
+                ]),
         ];
     }
 

@@ -21,7 +21,7 @@ class InstrumentEventEditScreen extends Screen
 
     public $instrumentEvent;
 
-    public function query(InstrumentEvent $instrumentEvent, string $eventType): array
+    public function query(InstrumentEvent $instrumentEvent): array
     {
 
         return [
