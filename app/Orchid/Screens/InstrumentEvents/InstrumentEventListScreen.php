@@ -28,6 +28,7 @@ class InstrumentEventListScreen extends Screen
             Link::make('➕ Registrar Evento')
                 ->icon('plus')
                 ->route('platform.instrument_events.create'),
+            // todo error en la pagina cargar esta ruta0
         ];
     }
 
