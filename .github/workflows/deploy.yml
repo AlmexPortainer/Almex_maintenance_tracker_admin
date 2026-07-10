@@ -90,15 +90,16 @@ jobs:
       - name: Escribir .env desde secreto
         env:
           PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
-        run: printf '%s\n' "$PROD_ENV_FILE" > "$RUNNER_TEMP/almex.env"
+        # Se escribe como .env en el checkout: compose lo usa para
+        # interpolación (--env-file) y para inyectarlo al contenedor (env_file).
+        run: printf '%s\n' "$PROD_ENV_FILE" > .env
 
       - name: Deploy stack
         env:
-          ENV_FILE: ${{ runner.temp }}/almex.env
           APP_IMAGE: ${{ needs.build.outputs.image_ref }}
         run: |
           set -e
-          COMPOSE="docker compose -f docker-compose.portainer.yml --env-file ${ENV_FILE}"
+          COMPOSE="docker compose -f docker-compose.portainer.yml --env-file .env"
 
           echo ">> Pull de la imagen ${APP_IMAGE}"
           APP_IMAGE=${APP_IMAGE} ${COMPOSE} pull
@@ -112,6 +113,6 @@ jobs:
           echo ">> Limpieza"
           docker image prune -f
 
-      - name: Borrar .env temporal
+      - name: Borrar .env
         if: always()
-        run: rm -f "$RUNNER_TEMP/almex.env"
+        run: rm -f .env
