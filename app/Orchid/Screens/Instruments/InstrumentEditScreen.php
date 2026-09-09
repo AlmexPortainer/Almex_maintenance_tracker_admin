@@ -51,7 +51,11 @@ class InstrumentEditScreen extends Screen
                 ])->title('Tipo'),
                 Input::make('instrument.department')->title('Departamento'),
                 Input::make('instrument.location')->title('Ubicación'),
-                Input::make('instrument.form')->title('Forma'),
+                Select::make('instrument.form')->options([
+                    'Instrumento Electronico' => 'Instrumento Electrónico',
+                    'Instrumento Mecánico' => 'Instrumento Mecánico',
+                    'Instrumento Simple' => 'Instrumento Simple',
+                ])->title('Forma'),
                 Input::make('instrument.Variable Unidad De Medida')->title('Variable / Unidad'),
                 Input::make('instrument.brand')->title('Marca'),
                 Input::make('instrument.model')->title('Modelo'),
