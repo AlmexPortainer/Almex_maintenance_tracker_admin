@@ -21,6 +21,8 @@
             font-size: 9px;
             line-height: 1.2;
             color: #000;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
         /* ===========================
@@ -203,7 +205,7 @@
            =========================== */
         @media print {
             @page {
-                size: 80mm;
+                size: 80mm auto;
                 margin: 0;
             }
 
@@ -211,6 +213,14 @@
                 width: 80mm;
                 margin: 0;
                 padding: 0;
+                /* Forzar impresión de fondos (negro FUERA DE SERVICIO, sombreados) */
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            /* El botón no se imprime ni deja hueco */
+            button {
+                display: none !important;
             }
 
             body * {
@@ -239,8 +249,9 @@
 <button type="button" onclick="window.print()">🖨 Imprimir Ticket</button>
 
 {{-- =====================================================
-   TICKET NORMAL
+   TICKET NORMAL (solo si el equipo está APTO)
    ===================================================== --}}
+@if($apto)
 <div class="ticket-80mm ticket-print">
 
     {{-- FILA CRÍTICA --}}
@@ -317,8 +328,9 @@
 
 </div>
 
+@else
 {{-- =====================================================
-   TICKET FUERA DE SERVICIO
+   TICKET FUERA DE SERVICIO (solo si el equipo NO está APTO)
    ===================================================== --}}
 <div class="ticket-80mm ticket-print">
     <div class="row-equipo">
@@ -366,5 +378,6 @@
     </div>
 
 </div>
+@endif
 </body>
 </html>
