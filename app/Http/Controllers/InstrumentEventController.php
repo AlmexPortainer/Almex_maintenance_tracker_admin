@@ -38,7 +38,7 @@ class InstrumentEventController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'instrument_id' => 'required|exists:intruments,id',
+            'instrument_id' => 'required|exists:instruments,id',
             'event_type' => 'required|in:CALIBRACION,VALIDACION,MANTENIMIENTO',
             'fecha_evento' => 'required|date',
             'responsable' => 'nullable|string|max:255',

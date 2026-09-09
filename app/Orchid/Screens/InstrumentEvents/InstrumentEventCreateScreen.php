@@ -72,7 +72,7 @@ class InstrumentEventCreateScreen extends screen
     public function save(Request $request, InstrumentEvent $instrumentEvent)
     {
         $validated = $request->validate([
-            'instrumentEvent.instrument_id' => 'required|exists:intruments,id',
+            'instrumentEvent.instrument_id' => 'required|exists:instruments,id',
             'instrumentEvent.event_type' => 'required|in:CALIBRACION,VALIDACION,MANTENIMIENTO',
             'instrumentEvent.fecha_evento' => 'required|date',
             'instrumentEvent.responsable' => 'nullable|string|max:255',

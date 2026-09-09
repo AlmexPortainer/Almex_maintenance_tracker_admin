@@ -14,7 +14,7 @@ class StoreInstrumentEventRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'instrument_id' => 'required|exists:intruments,id',
+            'instrument_id' => 'required|exists:instruments,id',
             'event_type' => 'required|in:CALIBRACION,VALIDACION,MANTENIMIENTO',
             'fecha_evento' => 'required|date',
             'responsable' => 'nullable|string|max:255',

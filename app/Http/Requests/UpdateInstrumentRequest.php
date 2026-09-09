@@ -25,7 +25,7 @@ class UpdateInstrumentRequest extends FormRequest
             'equipo' => 'nullable|string|max:255',
             'brand' => 'nullable|string|max:255',
             'model' => 'nullable|string|max:255',
-            'code' => 'sometimes|string|max:255|unique:intruments,code,'.$instrumentId,
+            'code' => 'sometimes|string|max:255|unique:instruments,code,'.$instrumentId,
             'emt_value' => 'nullable|string|max:255',
             'emt_value_decimal' => 'nullable|numeric',
             'emt_unit' => 'nullable|string|max:255',
