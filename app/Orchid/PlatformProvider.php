@@ -81,25 +81,25 @@ class PlatformProvider extends OrchidServiceProvider
                 ->route('platform.instruments.tickets'),
 
             Menu::make('Reportería CALIBRACION')
-                ->icon('bs.clipboard-data')
+                ->icon('bs.speedometer2')
                 ->title('Reportería')
                 ->list([
                     Menu::make('Produccion')
-                        ->icon('bs.book')
+                        ->icon('bs.gear-wide-connected')
                         ->route('platform.reporter', [
                             'tipo' => 'calibracion',
                             'area' => 'produccion',
                         ]),
 
                     Menu::make('Calidad')
-                        ->icon('bs.book')
+                        ->icon('bs.patch-check')
                         ->route('platform.reporter', [
                             'tipo' => 'calibracion',
                             'area' => 'calidad',
                         ]),
 
                     Menu::make('Servicios')
-                        ->icon('bs.book')
+                        ->icon('bs.wrench-adjustable')
                         ->route('platform.reporter', [
                             'tipo' => 'calibracion',
                             'area' => 'servicios',
@@ -108,24 +108,24 @@ class PlatformProvider extends OrchidServiceProvider
 
             // ===== VERIFICACION =====
             Menu::make('VERIFICACIÓN')
-                ->icon('bs.check2-square')
+                ->icon('bs.clipboard-check')
                 ->list([
                     Menu::make('Producción')
-                        ->icon('bs.book')
+                        ->icon('bs.gear-wide-connected')
                         ->route('platform.reporter', [
                             'tipo' => 'verificacion',
                             'area' => 'produccion',
                         ]),
 
                     Menu::make('Calidad')
-                        ->icon('bs.book')
+                        ->icon('bs.patch-check')
                         ->route('platform.reporter', [
                             'tipo' => 'verificacion',
                             'area' => 'calidad',
                         ]),
 
                     Menu::make('Servicios')
-                        ->icon('bs.book')
+                        ->icon('bs.wrench-adjustable')
                         ->route('platform.reporter', [
                             'tipo' => 'verificacion',
                             'area' => 'servicios',
@@ -137,21 +137,21 @@ class PlatformProvider extends OrchidServiceProvider
                 ->icon('bs.tools')
                 ->list([
                     Menu::make('Producción')
-                        ->icon('bs.book')
+                        ->icon('bs.gear-wide-connected')
                         ->route('platform.reporter', [
                             'tipo' => 'mantenimiento',
                             'area' => 'produccion',
                         ]),
 
                     Menu::make('Calidad')
-                        ->icon('bs.book')
+                        ->icon('bs.patch-check')
                         ->route('platform.reporter', [
                             'tipo' => 'mantenimiento',
                             'area' => 'calidad',
                         ]),
 
                     Menu::make('Servicios')
-                        ->icon('bs.book')
+                        ->icon('bs.wrench-adjustable')
                         ->route('platform.reporter', [
                             'tipo' => 'mantenimiento',
                             'area' => 'servicios',

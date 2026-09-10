@@ -16,10 +16,19 @@ class InstrumentListScreen extends Screen
 
     public function query(): iterable
     {
+        $query = Instrument::criticality(request('types_of_criticality'));
+
+        $due = request('due');
+        $band = request('band');
+
+        if ($due === 'any') {
+            $query->overdueAny();
+        } elseif (in_array($due, ['calibracion', 'verificacion', 'mantenimiento'], true) && $band) {
+            $query->due($due, $band);
+        }
+
         return [
-            'instruments' => Instrument::criticality(
-                request('types_of_criticality')
-            )->paginate(),
+            'instruments' => $query->paginate(),
         ];
     }
 

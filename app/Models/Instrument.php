@@ -251,4 +251,63 @@ class Instrument extends Model
             $this->maintenance_periodicity_days
         );
     }
+
+    /* =====================================================
+     | HORIZONTES DE VENCIMIENTO (DASHBOARD / REPORTERÍA)
+     ===================================================== */
+
+    /**
+     * Campos next_/period_ según el tipo de evento.
+     */
+    public static function typeFields(string $tipo): array
+    {
+        return match ($tipo) {
+            'verificacion' => ['next' => 'next_validation_date', 'period' => 'validation_periodicity_days'],
+            'mantenimiento' => ['next' => 'next_maintenance_date', 'period' => 'maintenance_periodicity_days'],
+            default => ['next' => 'next_calibration_date', 'period' => 'calibration_periodicity_days'],
+        };
+    }
+
+    /**
+     * Instrumentos que requieren un evento y caen en una banda de horizonte.
+     * Bandas exclusivas: vencido | b0_15 | b16_30 | b31_90.
+     */
+    public function scopeDue($query, string $tipo, string $band): void
+    {
+        $f = self::typeFields($tipo);
+        $today = Carbon::today();
+        $d = fn (int $n): string => $today->copy()->addDays($n)->toDateString();
+
+        $query->where($f['period'], '>', 0)->whereNotNull($f['next']);
+
+        match ($band) {
+            'vencido' => $query->whereDate($f['next'], '<', $d(0)),
+            'b0_15' => $query->whereBetween($f['next'], [$d(0), $d(15)]),
+            'b16_30' => $query->whereBetween($f['next'], [$d(16), $d(30)]),
+            'b31_90' => $query->whereBetween($f['next'], [$d(31), $d(90)]),
+            default => null,
+        };
+    }
+
+    /**
+     * Instrumentos con al menos un evento vencido (cualquier tipo).
+     */
+    public function scopeOverdueAny($query): void
+    {
+        $today = Carbon::today()->toDateString();
+
+        $sets = [
+            ['calibration_periodicity_days', 'next_calibration_date'],
+            ['validation_periodicity_days', 'next_validation_date'],
+            ['maintenance_periodicity_days', 'next_maintenance_date'],
+        ];
+
+        $query->where(function ($q) use ($sets, $today) {
+            foreach ($sets as [$period, $next]) {
+                $q->orWhere(function ($qq) use ($period, $next, $today) {
+                    $qq->where($period, '>', 0)->whereDate($next, '<', $today);
+                });
+            }
+        });
+    }
 }
