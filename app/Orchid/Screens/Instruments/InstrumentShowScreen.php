@@ -3,6 +3,8 @@
 namespace App\Orchid\Screens\Instruments;
 
 use App\Models\Instrument;
+use App\Models\InstrumentEvent;
+use App\Orchid\Concerns\ExportsTable;
 use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Screen;
 use Orchid\Screen\Sight;
@@ -11,6 +13,8 @@ use Orchid\Support\Facades\Layout;
 
 class InstrumentShowScreen extends Screen
 {
+    use ExportsTable;
+
     public $name = 'Detalle del Instrumento';
 
     public $description = 'Información general del instrumento y su historial de eventos.';
@@ -30,7 +34,38 @@ class InstrumentShowScreen extends Screen
             Link::make('✏️ Editar')
                 // ->icon('pencil')
                 ->route('platform.instruments.edit', $this->instrument->id),
+
+            ...$this->exportButtons(),
         ];
+    }
+
+    protected function exportFileName(): string
+    {
+        $instrument = request()->route('instrument');
+
+        return 'instrumento-'.($instrument->code ?? $instrument->id).'-historial';
+    }
+
+    protected function exportHeadings(): array
+    {
+        return ['Tipo', 'Fecha', 'Responsable', 'Reporte', 'Adecuado', 'Próxima'];
+    }
+
+    protected function exportRows(): array
+    {
+        $instrument = request()->route('instrument');
+
+        return $instrument->events()
+            ->orderByDesc('fecha_evento')
+            ->get()
+            ->map(fn (InstrumentEvent $e) => [
+                $e->event_type,
+                $e->fecha_evento?->format('Y-m-d'),
+                $e->responsable,
+                $e->reporte,
+                $e->adecuado ? 'Sí' : 'No',
+                $e->fecha_proxima?->format('Y-m-d'),
+            ])->all();
     }
 
     public function layout(): array

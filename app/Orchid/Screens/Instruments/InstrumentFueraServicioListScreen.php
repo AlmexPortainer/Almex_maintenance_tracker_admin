@@ -3,6 +3,7 @@
 namespace App\Orchid\Screens\Instruments;
 
 use App\Models\Instrument;
+use App\Orchid\Concerns\ExportsTable;
 use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Screen;
 use Orchid\Screen\TD;
@@ -10,6 +11,8 @@ use Orchid\Support\Facades\Layout;
 
 class InstrumentFueraServicioListScreen extends Screen
 {
+    use ExportsTable;
+
     public $name = 'Instrumentos Fuera de Servicio';
 
     public $description = 'Instrumentos con estado Fuera de Servicio. Fuera del catálogo principal, disponibles para auditoría e histórico.';
@@ -27,7 +30,33 @@ class InstrumentFueraServicioListScreen extends Screen
             Link::make('Volver al catálogo')
                 ->icon('bs.arrow-left')
                 ->route('platform.instruments.list'),
+
+            ...$this->exportButtons(),
         ];
+    }
+
+    protected function exportFileName(): string
+    {
+        return 'instrumentos-fuera-de-servicio';
+    }
+
+    protected function exportHeadings(): array
+    {
+        return ['Departamento', 'Ubicación', 'Equipo', 'Marca', 'Modelo', 'Código', 'Estado', 'Actualizado'];
+    }
+
+    protected function exportRows(): array
+    {
+        return Instrument::status(Instrument::ESTADO_FUERA_SERVICIO)->get()->map(fn (Instrument $i) => [
+            $i->department,
+            $i->location,
+            $i->name,
+            $i->brand,
+            $i->model,
+            $i->code,
+            $i->status,
+            $i->updated_at?->format('Y-m-d H:i'),
+        ])->all();
     }
 
     public function layout(): array

@@ -3,6 +3,7 @@
 namespace App\Orchid\Screens\InstrumentEvents;
 
 use App\Models\InstrumentEvent;
+use App\Orchid\Concerns\ExportsTable;
 use Orchid\Screen\Actions\DropDown;
 use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Screen;
@@ -11,6 +12,8 @@ use Orchid\Support\Facades\Layout;
 
 class InstrumentEventListScreen extends Screen
 {
+    use ExportsTable;
+
     public $name = 'Historial de Eventos de Instrumentos';
 
     public $description = 'Calibraciones, validaciones y mantenimientos registrados.';
@@ -35,7 +38,32 @@ class InstrumentEventListScreen extends Screen
                     Link::make('🛠️ Mantenimiento')
                         ->route('platform.instrument_events.create', 'MANTENIMIENTO'),
                 ]),
+
+            ...$this->exportButtons(),
         ];
+    }
+
+    protected function exportFileName(): string
+    {
+        return 'historial-eventos';
+    }
+
+    protected function exportHeadings(): array
+    {
+        return ['Tipo', 'Instrumento', 'Fecha', 'Responsable', 'Reporte', 'Adecuado', 'Próxima'];
+    }
+
+    protected function exportRows(): array
+    {
+        return InstrumentEvent::with('instrument')->get()->map(fn (InstrumentEvent $e) => [
+            $e->event_type,
+            $e->instrument?->code,
+            $e->fecha_evento?->format('Y-m-d'),
+            $e->responsable,
+            $e->reporte,
+            $e->adecuado ? 'Sí' : 'No',
+            $e->fecha_proxima?->format('Y-m-d'),
+        ])->all();
     }
 
     public function layout(): array

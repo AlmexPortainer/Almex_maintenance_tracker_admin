@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Orchid\Screens\Reporter;
 
 use App\Models\Instrument;
+use App\Orchid\Concerns\ExportsTable;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Orchid\Screen\Actions\Button;
@@ -15,6 +16,8 @@ use Orchid\Support\Facades\Layout;
 
 class ReporterScreen extends Screen
 {
+    use ExportsTable;
+
     /** Ventanas de horizonte disponibles (días). */
     private const WINDOWS = [30, 60, 90];
 
@@ -76,20 +79,61 @@ class ReporterScreen extends Screen
 
         $this->name = ucfirst($tipo).' - '.$this->areaLabel($area);
 
-        $fields = $this->fieldsFor($tipo);
-        $limitDate = Carbon::today()->addDays($this->days);
+        return [
+            'instruments' => $this->reportQuery($tipo, $area, $this->days)->paginate(30),
+        ];
+    }
 
-        $instruments = Instrument::query()
+    /**
+     * Query del reporte según tipo/área/horizonte. Reutilizada por vista y export.
+     */
+    private function reportQuery(string $tipo, string $area, int $days)
+    {
+        $fields = $this->fieldsFor($tipo);
+        $limitDate = Carbon::today()->addDays($days);
+
+        return Instrument::query()
             ->where('department', $this->areaLabel($area))
             ->where($fields['period'], '>', 0)
             ->whereNotNull($fields['next'])
             ->whereDate($fields['next'], '<=', $limitDate)
-            ->orderBy($fields['next'])
-            ->paginate(30);
+            ->orderBy($fields['next']);
+    }
 
-        return [
-            'instruments' => $instruments,
-        ];
+    public function commandBar(): array
+    {
+        return $this->exportButtons();
+    }
+
+    protected function exportFileName(): string
+    {
+        return 'reporte-'.request()->route('tipo').'-'.request()->route('area');
+    }
+
+    protected function exportHeadings(): array
+    {
+        return ['Código', 'Nombre', 'Equipo', 'Última', 'Próxima', 'Estado', 'Departamento', 'Ubicación'];
+    }
+
+    protected function exportRows(): array
+    {
+        $tipo = (string) request()->route('tipo');
+        $area = (string) request()->route('area');
+        $days = (int) request()->input('days', 30);
+        $days = in_array($days, self::WINDOWS, true) ? $days : 30;
+
+        $fields = $this->fieldsFor($tipo);
+
+        return $this->reportQuery($tipo, $area, $days)->get()->map(fn (Instrument $i) => [
+            $i->code,
+            $i->name,
+            $i->equipo,
+            optional($i->{$fields['last']})?->format('Y-m-d') ?? '—',
+            optional($i->{$fields['next']})?->format('Y-m-d') ?? '—',
+            $i->{$fields['status']}(),
+            $i->department,
+            $i->location,
+        ])->all();
     }
 
     public function layout(): iterable
