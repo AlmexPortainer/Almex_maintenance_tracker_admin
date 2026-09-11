@@ -93,6 +93,7 @@ class ReporterScreen extends Screen
         $limitDate = Carbon::today()->addDays($days);
 
         return Instrument::query()
+            ->where('status', Instrument::ESTADO_ACTIVO) // solo activos: excluye Baja/Fuera de Servicio/Stock
             ->where('department', $this->areaLabel($area))
             ->where($fields['period'], '>', 0)
             ->whereNotNull($fields['next'])
