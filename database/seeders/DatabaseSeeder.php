@@ -20,9 +20,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        $this->call(InstrumentZacSeeder::class);
-
-        // $this->call(InstrumentSeeder::class);
-        $this->call(InstrumentEventSeeder::class);
+        // Carga inicial desde el export de Access (database/mdb_export/*.json).
+        $this->call(InstrumentImportSeeder::class);
     }
 }

@@ -39,6 +39,21 @@ class Instrument extends Model
 
     public const STATUS_NO_REQUIERE = 'NO_REQUIERE';
 
+    // Estado operativo original (columna `status`, proveniente de Access)
+    public const ESTADO_ACTIVO = 'Activo';
+
+    public const ESTADO_BAJA = 'Baja';
+
+    public const ESTADO_FUERA_SERVICIO = 'Fuera de Servicio';
+
+    public const ESTADO_STOCK = 'Stock';
+
+    // Estados que NO aparecen en el catálogo principal (se administran aparte)
+    public const ESTADOS_OCULTOS = [
+        self::ESTADO_BAJA,
+        self::ESTADO_FUERA_SERVICIO,
+    ];
+
     /* =====================================================
      | ATRIBUTOS MASS ASSIGNMENT
      ===================================================== */
@@ -88,6 +103,7 @@ class Instrument extends Model
         'validation_periodicity_days',
         'maintenance_periodicity_days',
         'is_operational',
+        'status',
         'observations',
     ];
 
@@ -173,6 +189,20 @@ class Instrument extends Model
         if ($criticality) {
             $query->where('types_of_criticality', $criticality);
         }
+    }
+
+    /**
+     * Catálogo principal: excluye estados que se administran en listados aparte
+     * (Baja, Fuera de Servicio). Los deja fuera del "ruido" pero siguen en BD.
+     */
+    public function scopeVisibles($query): void
+    {
+        $query->whereNotIn('status', self::ESTADOS_OCULTOS);
+    }
+
+    public function scopeStatus($query, string $status): void
+    {
+        $query->where('status', $status);
     }
 
     /* =====================================================

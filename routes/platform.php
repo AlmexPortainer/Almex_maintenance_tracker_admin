@@ -15,7 +15,9 @@ use App\Orchid\Screens\InstrumentEvents\InstrumentEventCreateScreen;
 use App\Orchid\Screens\InstrumentEvents\InstrumentEventEditScreen;
 use App\Orchid\Screens\InstrumentEvents\InstrumentEventListScreen;
 use App\Orchid\Screens\InstrumentEvents\InstrumentEventShowScreen;
+use App\Orchid\Screens\Instruments\InstrumentBajaListScreen;
 use App\Orchid\Screens\Instruments\InstrumentEditScreen;
+use App\Orchid\Screens\Instruments\InstrumentFueraServicioListScreen;
 use App\Orchid\Screens\Instruments\InstrumentListScreen;
 use App\Orchid\Screens\Instruments\InstrumentShowScreen;
 use App\Orchid\Screens\Instruments\InstrumentTicketScreen;
@@ -140,6 +142,20 @@ Route::screen('instruments', InstrumentListScreen::class)
     ->breadcrumbs(fn (Trail $trail) => $trail
         ->parent('platform.main')
         ->push(__('Instrumentos'), route('platform.instruments.list')));
+
+// Listados por estado (administración + auditoría) — deben ir ANTES de
+// 'instruments/{instrument}' para no ser capturados por el parámetro.
+Route::screen('instruments/baja', InstrumentBajaListScreen::class)
+    ->name('platform.instruments.baja')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.instruments.list')
+        ->push(__('Dados de Baja')));
+
+Route::screen('instruments/fuera-de-servicio', InstrumentFueraServicioListScreen::class)
+    ->name('platform.instruments.fuera_servicio')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.instruments.list')
+        ->push(__('Fuera de Servicio')));
 
 Route::screen('instruments/create', InstrumentEditScreen::class)
     ->name('platform.instruments.create')

@@ -27,7 +27,6 @@ class InstrumentEventShowScreen extends Screen
     {
         return [
             Link::make('✏️ Editar Evento')
-                ->icon('pencil')
                 ->route('platform.instruments.events.edit', [
                     'instrument' => $this->instrumentEvent->instrument_id,
                     'instrumentEvent' => $this->instrumentEvent->id,

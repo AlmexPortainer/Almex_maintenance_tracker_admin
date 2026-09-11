@@ -25,6 +25,10 @@ class InstrumentEventCreateScreen extends screen
     {
         return [
             'eventType' => $event_type,
+            // Preselecciona el tipo según el menú de origen (CALIBRACION/VALIDACION/MANTENIMIENTO).
+            'instrumentEvent' => [
+                'event_type' => $event_type,
+            ],
         ];
     }
 
@@ -32,7 +36,6 @@ class InstrumentEventCreateScreen extends screen
     {
         return [
             Button::make('💾 Guardar')
-                ->icon('check')
                 ->method('save'),
         ];
     }

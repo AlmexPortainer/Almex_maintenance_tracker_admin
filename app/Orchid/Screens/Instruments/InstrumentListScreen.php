@@ -16,7 +16,7 @@ class InstrumentListScreen extends Screen
 
     public function query(): iterable
     {
-        $query = Instrument::criticality(request('types_of_criticality'));
+        $query = Instrument::visibles()->criticality(request('types_of_criticality'));
 
         $due = request('due');
         $band = request('band');

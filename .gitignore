@@ -1,5 +1,13 @@
 *.log
 .DS_Store
+
+# Extracción Access (.mdb) — datos fuente y herramientas, no versionar
+/database/*.mdb
+/database/mdb_export
+/scripts/mdblib
+/scripts/mdb_list.ps1
+/scripts/json_to_sqlite.py
+
 .env
 .env.backup
 .env.production

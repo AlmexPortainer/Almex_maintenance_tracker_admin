@@ -35,7 +35,6 @@ class InstrumentEventEditScreen extends Screen
     {
         return [
             Button::make('💾 Guardar')
-                ->icon('check')
                 ->method('save'),
         ];
     }

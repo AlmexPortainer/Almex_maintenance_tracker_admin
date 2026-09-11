@@ -27,7 +27,6 @@ class InstrumentEventListScreen extends Screen
     {
         return [
             DropDown::make('➕ Registrar Evento')
-                ->icon('plus')
                 ->list([
                     Link::make('📏 Calibración')
                         ->route('platform.instrument_events.create', 'CALIBRACION'),

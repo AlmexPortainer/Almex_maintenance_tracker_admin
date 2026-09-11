@@ -76,6 +76,21 @@ class PlatformProvider extends OrchidServiceProvider
                         ->badge(fn () => Instrument::where('types_of_criticality', 'NO_CRITICO')->count()),
                 ]),
 
+            Menu::make('Administración de Estados')
+                ->icon('bs.archive')
+                ->title('Instrumentos fuera del catálogo')
+                ->list([
+                    Menu::make('Dados de Baja')
+                        ->icon('bs.trash')
+                        ->route('platform.instruments.baja')
+                        ->badge(fn () => Instrument::where('status', Instrument::ESTADO_BAJA)->count()),
+
+                    Menu::make('Fuera de Servicio')
+                        ->icon('bs.exclamation-octagon')
+                        ->route('platform.instruments.fuera_servicio')
+                        ->badge(fn () => Instrument::where('status', Instrument::ESTADO_FUERA_SERVICIO)->count()),
+                ]),
+
             Menu::make('Tickets de Instrumentos')
                 ->icon('bs.printer')
                 ->route('platform.instruments.tickets'),
